@@ -1,0 +1,22 @@
+{
+    "name": "jenna",
+    "version": "0.0.0",
+    "description": "Mapping genomic data and such",
+    "main": "main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dglmoore/jenna.git"
+    },
+    "author": "Douglas G. Moore <doug@dglmoore.com>",
+    "contributors": [
+        "Greer Dolby <gadolby@asu.edu>"
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/dglmoore/jenna/issues"
+    },
+    "homepage": "https://dglmoore.github.io/jenna"
+}
