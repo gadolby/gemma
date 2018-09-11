@@ -23,6 +23,7 @@
         "jest": "^23.6.0"
     },
     "dependencies": {
-        "commander": "^2.18.0"
+        "commander": "^2.18.0",
+        "sqlite3": "^4.0.2"
     }
 }
