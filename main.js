@@ -3,7 +3,8 @@
 // license that can be found in the LICENSE file.
 const program = require('commander');
 const jenna = {
-    import: require('./src/import')
+    import: require('./src/import'),
+    query: require('./src/query')
 };
 
 program
@@ -16,6 +17,11 @@ program
     .command('import-env <csv-filename>')
     .description('Import environmental data into database')
     .action(jenna.import.env);
+
+program
+    .command('query <sampleid> <chromosome> <position>')
+    .description('Query the database for entries')
+    .action(jenna.query);
 
 program.on('command:*', function() {
     console.error(program.helpInformation());

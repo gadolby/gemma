@@ -55,8 +55,32 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
         }
     };
 
+    var query = function(sid, chr, pos, callback) {
+        let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
+
+        let result = {
+            SampleId: sid,
+            Chromosome: chr,
+            Position: pos,
+            Alternates: [],
+            Environment: {}
+        };
+
+        db.all(query, sid, chr, pos, function(err, entries) {
+            if (err !== null) {
+                callback(err);
+            }
+            entries.forEach(function(entry) {
+                result.Alternates[entry.ChromosomeCopy - 1] = entry.Alternate;
+                result.Environment[entry.Name] = entry.Value;
+            });
+            callback(null, result);
+        });
+    };
+
     return {
         insert_entry: insert_entry,
-        insert_environment: insert_environment
+        insert_environment: insert_environment,
+        query: query
     };
 };
