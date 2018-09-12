@@ -8,7 +8,7 @@ const jenna = {
 
 program
     .version('0.0.0')
-    .command('import-vcf [filename]')
+    .command('import-vcf <vcf-filename>')
     .description('Import VCF file into database')
     .action(jenna.import.vcf);
 
