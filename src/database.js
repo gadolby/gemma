@@ -12,6 +12,7 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
             this.run('pragma journal_mode = MEMORY', callback);
             this.run('CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))', callback);
             this.run('CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))', callback);
+            this.run('CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))', callback);
         }
     });
 
@@ -43,7 +44,19 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
         insert_variants(entry, callback);
     };
 
+    var insert_environment = function(env, callback) {
+        let query = 'INSERT INTO environment (SampleID, Name, Value) VALUES (?,?,?)';
+        for (var sampleid in env) {
+            let data = env[sampleid];
+            for (var name in data) {
+                let value = (data[name].length === 0) ? null : data[name];
+                db.run(query, sampleid, name, value, callback);
+            }
+        }
+    };
+
     return {
-        insert_entry: insert_entry
+        insert_entry: insert_entry,
+        insert_environment: insert_environment
     };
 };

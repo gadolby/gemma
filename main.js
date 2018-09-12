@@ -13,9 +13,9 @@ program
     .action(jenna.import.vcf);
 
 program
-    .command('import-geo <csv-filename>')
-    .description('Import Geo data into database')
-    .action(jenna.import.geo);
+    .command('import-env <csv-filename>')
+    .description('Import environmental data into database')
+    .action(jenna.import.env);
 
 program.on('command:*', function() {
     console.error(program.helpInformation());
