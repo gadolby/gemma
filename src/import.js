@@ -6,11 +6,6 @@ const jdb = require('./database');
 const vcf = require('bionode-vcf');
 
 module.exports = function(filename) {
-    if (fs.existsSync('jenna.db')) {
-        console.error('The jenna database already exists. Delete it before trying to import again.');
-        return;
-    }
-
     var db = new jdb.Database('jenna.db', function(err) {
         if (err !== null) {
             console.error(err);
@@ -31,12 +26,8 @@ module.exports = function(filename) {
         });
     });
 
-    vcf.on('end', function() {
-        console.log(`${filename} has ${n} entries`);
-        process.exit(0);
-    });
-
     vcf.on('error', function(err) {
         console.error(err);
+        process.exit(1);
     });
 };
