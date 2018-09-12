@@ -3,15 +3,14 @@
 // license that can be found in the LICENSE file.
 const sqlite3 = require('sqlite3').verbose();
 
-module.exports.Database = function(filename='jenna.db', callback) {
+module.exports.Database = function(filename = 'jenna.db', callback) {
     var db = new sqlite3.Database(filename, function(err) {
         if (err !== null) {
             callback(err);
         } else {
             this.run('pragma synchronous = OFF', callback);
             this.run('pragma journal_mode = MEMORY', callback);
-            this.run('CREATE TABLE IF NOT EXISTS variants ( SampleID string, Chromosome string, Position int, ChromosomeCopy int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy) )', callback);
-            this.run('CREATE TABLE IF NOT EXISTS reference ( Chromosome string, Position Int, PRIMARY KEY (Chromosome, Position) )', callback);
+            this.run('CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))', callback);
         }
     });
 
@@ -19,7 +18,16 @@ module.exports.Database = function(filename='jenna.db', callback) {
         db.close(callback);
     };
 
+    var insert_alternates = function(entry, callback) {
+        let is_snp = (entry.varinfo.type == 'SNP'),
+            query = 'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)';
+        db.run(query, 0, entry.chr, entry.pos, entry.ref, is_snp, callback);
+        entry.alt.split(',').forEach(function(alt, i) {
+            db.run(query, i + 1, entry.chr, entry.pos, alt, is_snp, callback);
+        });
+    };
+
     return {
-        db: db
+        insert_alternates: insert_alternates
     };
 };

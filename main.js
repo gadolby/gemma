@@ -2,14 +2,15 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 const program = require('commander');
+const jenna = {
+    import: require('./import')
+};
 
 program
     .version('0.0.0')
     .command('import [filename]')
     .description('Import VCF file into database')
-    .action(function(filename) {
-        console.log('filename: ' + filename);
-    });
+    .action(jenna.import);
 
 program.on('command:*', function() {
     console.error(program.helpInformation());
