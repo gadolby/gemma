@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 const program = require('commander');
 const jenna = {
-    import: require('./import')
+    import: require('./src/import')
 };
 
 program
