@@ -12,6 +12,11 @@ program
     .description('Import VCF file into database')
     .action(jenna.import.vcf);
 
+program
+    .command('import-geo <csv-filename>')
+    .description('Import Geo data into database')
+    .action(jenna.import.geo);
+
 program.on('command:*', function() {
     console.error(program.helpInformation());
     process.exit(1);

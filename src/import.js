@@ -4,6 +4,7 @@
 const fs = require('fs');
 const jdb = require('./database');
 const vcf = require('bionode-vcf');
+const csv = require('csv');
 
 var import_vcf = function(filename) {
     var db = new jdb.Database('jenna.db', function(err) {
@@ -32,6 +33,11 @@ var import_vcf = function(filename) {
     });
 };
 
+var import_geo = function(filename) {
+    console.error('import-geo is not implemented yet');
+};
+
 module.exports = {
-    vcf: import_vcf
+    vcf: import_vcf,
+    geo: import_geo
 };
