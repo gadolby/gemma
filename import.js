@@ -24,7 +24,7 @@ module.exports = function(filename) {
     vcf.on('data', function(entry) {
         n += 1;
 
-        db.insert_alternates(entry, function(err) {
+        db.insert_entry(entry, function(err) {
             if (err !== null) {
                 vcf.emit('error', err);
             }
