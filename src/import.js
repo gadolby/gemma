@@ -5,7 +5,7 @@ const fs = require('fs');
 const jdb = require('./database');
 const vcf = require('bionode-vcf');
 
-module.exports = function(filename) {
+var import_vcf = function(filename) {
     var db = new jdb.Database('jenna.db', function(err) {
         if (err !== null) {
             console.error(err);
@@ -30,4 +30,8 @@ module.exports = function(filename) {
         console.error(err);
         process.exit(1);
     });
+};
+
+module.exports = {
+    vcf: import_vcf
 };

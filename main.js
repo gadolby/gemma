@@ -8,9 +8,9 @@ const jenna = {
 
 program
     .version('0.0.0')
-    .command('import [filename]')
+    .command('import-vcf [filename]')
     .description('Import VCF file into database')
-    .action(jenna.import);
+    .action(jenna.import.vcf);
 
 program.on('command:*', function() {
     console.error(program.helpInformation());
