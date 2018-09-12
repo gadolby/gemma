@@ -3,6 +3,10 @@
 // license that can be found in the LICENSE file.
 const sqlite3 = require('sqlite3').verbose();
 
+const snip_test = function(...alts) {
+    return alts.every(a => ['A','T','C','G'].find(b => a == b.toUpperCase()));
+};
+
 module.exports.Database = function(filename = 'jenna.db', callback) {
     var db = new sqlite3.Database(filename, function(err) {
         if (err !== null) {
@@ -21,10 +25,12 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
     };
 
     var insert_alternates = function(entry, callback) {
-        let is_snp = (entry.varinfo.type == 'SNP'),
-            query = 'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)';
+        let query = 'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)',
+            alts = entry.alt.split(','),
+            is_snp = snip_test(entry.ref, ...alts);
+
         db.run(query, 0, entry.chr, entry.pos, entry.ref, is_snp, callback);
-        entry.alt.split(',').forEach(function(alt, i) {
+        alts.forEach(function(alt, i) {
             db.run(query, i + 1, entry.chr, entry.pos, alt, is_snp, callback);
         });
     };
