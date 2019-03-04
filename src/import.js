@@ -6,14 +6,14 @@ const jdb = require('./database');
 const vcf = require('bionode-vcf');
 const csv = require('csv');
 
-var import_vcf = function(filename) {
-    var db = new jdb.Database('jenna.db', function(err) {
+var import_vcf = function(filename, cmd) {
+    var db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
             console.error(err);
         }
     });
 
-    console.log(`Importing VCF file ${filename}`);
+    process.stdout.write(`Importing VCF file ${filename}... `);
     vcf.read(filename);
 
     var n = 0;
@@ -31,10 +31,14 @@ var import_vcf = function(filename) {
         console.error(err);
         process.exit(1);
     });
+
+    vcf.on('end', function(err) {
+        process.stdout.write(`done. (${n} entries)`);
+    });
 };
 
-var import_env = function(filename) {
-    var db = new jdb.Database('jenna.db', function(err) {
+var import_env = function(filename, cmd) {
+    var db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
             console.error(err);
         }

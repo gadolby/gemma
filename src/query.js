@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 const jdb = require('./database');
 
-module.exports = function(sid, chr, pos) {
-    var db = new jdb.Database('jenna.db', function(err) {
+module.exports = function(sid, chr, pos, cmd) {
+    var db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
             throw err;
         }
