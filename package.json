@@ -20,7 +20,7 @@
     },
     "homepage": "https://dglmoore.github.io/jenna",
     "devDependencies": {
-        "jest": "^24.1.0"
+        "jest": "^24.5.0"
     },
     "dependencies": {
         "bionode-vcf": "^1.3.0",
