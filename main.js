@@ -1,6 +1,3 @@
-// Copyright 2018 Greer Dolby, Douglas G. Moore. All rights reserved.
-// Use of this source code is governed by a MIT
-// license that can be found in the LICENSE file.
 const program = require('commander');
 const jenna = {
     import: require('./src/import'),
@@ -25,7 +22,7 @@ program
     .command('query <sampleid> <chromosome> <position>')
     .option('-d, --database <filename>', 'Database filename', './jenna.db')
     .description('Query the database for entries')
-    .action(jenna.query);
+    .action(jenna.query.query);
 
 program.on('command:*', function() {
     process.stdout.write(program.helpInformation() + '\n');

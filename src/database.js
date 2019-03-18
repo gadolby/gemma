@@ -1,6 +1,3 @@
-// Copyright 2018 Greer Dolby, Douglas G. Moore. All rights reserved.
-// Use of this source code is governed by a MIT
-// license that can be found in the LICENSE file.
 const sqlite3 = require('sqlite3').verbose();
 
 const snip_test = function(...alts) {
