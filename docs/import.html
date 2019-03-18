@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><title>import</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="import"><meta name="groc-project-path" content="src/import.js"><meta name="groc-github-url" content="https://github.com/dglmoore/jenna"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/jenna/blob/master/src/import.js">src/import.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><p>Copyright 2018 Greer Dolby, Douglas G. Moore. All rights reserved.
+Use of this source code is governed by a MIT
+license that can be found in the LICENSE file.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">const</span> jdb = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./database'</span>);
+<span class="hljs-keyword">const</span> vcf = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-vcf'</span>);
+<span class="hljs-keyword">const</span> csv = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csv'</span>);
+
+<span class="hljs-keyword">let</span> import_vcf = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> jdb.Database(cmd.database, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+            process.stderr.write(err + <span class="hljs-string">'\n'</span>);
+        }
+    });
+
+    process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>... `</span>);
+    vcf.read(filename);
+
+    <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
+    vcf.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+        n += <span class="hljs-number">1</span>;
+
+        db.insert_entry(entry, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+            <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+                vcf.emit(<span class="hljs-string">'error'</span>, err);
+            }
+        });
+    });
+
+    vcf.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        process.stderr.write(err + <span class="hljs-string">'\n'</span>);
+        process.exit(<span class="hljs-number">1</span>);
+    });
+
+    vcf.on(<span class="hljs-string">'end'</span>, () =&gt; process.stdout.write(<span class="hljs-string">`done. (<span class="hljs-subst">${n}</span> entries)\n`</span>));
+};
+
+<span class="hljs-keyword">let</span> import_env = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> jdb.Database(cmd.database, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+            process.stderr.write(err + <span class="hljs-string">'\n'</span>);
+        }
+    });
+
+    fs.readFile(filename, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, data</span>) </span>{
+        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">throw</span> err;
+        }
+        csv.parse(data, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, data</span>) </span>{
+            <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">throw</span> err;
+            }
+
+            <span class="hljs-keyword">let</span> sampleid_index = data[<span class="hljs-number">0</span>].findIndex(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+                <span class="hljs-keyword">return</span> value.trim().toLowerCase() == <span class="hljs-string">'sampleid'</span>;
+            });
+
+            <span class="hljs-keyword">if</span> (sampleid_index === -<span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Environmental data does not include SampleIDs'</span>);
+            }
+
+            <span class="hljs-keyword">let</span> samples = [];
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>; i &lt; data.length; ++i) {
+                <span class="hljs-keyword">let</span> sid = data[i][sampleid_index];
+                <span class="hljs-keyword">if</span> (sid <span class="hljs-keyword">in</span> samples) {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`duplicate SampleID <span class="hljs-subst">${sid}</span>`</span>);
+                }
+                samples[sid] = {};
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> j = <span class="hljs-number">0</span>; j &lt; data[i].length; ++j) {
+                    <span class="hljs-keyword">if</span> (j != sampleid_index) {
+                        samples[sid][data[<span class="hljs-number">0</span>][j]] = data[i][j];
+                    }
+                }
+            }
+
+            db.insert_environment(samples, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+                <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+                    process.stderr.write(err + <span class="hljs-string">'\n'</span>);
+                    process.exit(<span class="hljs-number">1</span>);
+                }
+            });
+        });
+    });
+};
+
+<span class="hljs-built_in">module</span>.exports = {
+    vcf: import_vcf,
+    env: import_env
+};</div></div></div></div></body></html>

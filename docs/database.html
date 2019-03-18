@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><title>database</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="database"><meta name="groc-project-path" content="src/database.js"><meta name="groc-github-url" content="https://github.com/dglmoore/jenna"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/jenna/blob/master/src/database.js">src/database.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><p>Copyright 2018 Greer Dolby, Douglas G. Moore. All rights reserved.
+Use of this source code is governed by a MIT
+license that can be found in the LICENSE file.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> sqlite3 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sqlite3'</span>).verbose();
+
+<span class="hljs-keyword">const</span> snip_test = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...alts</span>) </span>{
+    <span class="hljs-keyword">return</span> alts.every(a =&gt; [<span class="hljs-string">'A'</span>,<span class="hljs-string">'T'</span>,<span class="hljs-string">'C'</span>,<span class="hljs-string">'G'</span>].find(b =&gt; a == b.toUpperCase()));
+};
+
+<span class="hljs-built_in">module</span>.exports.Database = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename = 'jenna.db', callback</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> sqlite3.Database(filename, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+            callback(err);
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">this</span>.run(<span class="hljs-string">'pragma synchronous = OFF'</span>, callback);
+            <span class="hljs-keyword">this</span>.run(<span class="hljs-string">'pragma journal_mode = MEMORY'</span>, callback);
+            <span class="hljs-keyword">this</span>.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))'</span>, callback);
+            <span class="hljs-keyword">this</span>.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))'</span>, callback);
+            <span class="hljs-keyword">this</span>.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))'</span>, callback);
+        }
+    });
+
+    <span class="hljs-keyword">let</span> close = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">callback</span>) </span>{
+        db.close(callback);
+    };
+
+    <span class="hljs-keyword">let</span> insert_alternates = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)'</span>,
+            alts = entry.alt.split(<span class="hljs-string">','</span>),
+            is_snp = snip_test(entry.ref, ...alts);
+
+        db.run(query, <span class="hljs-number">0</span>, entry.chr, entry.pos, entry.ref, is_snp, callback);
+        alts.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt, i</span>) </span>{
+            db.run(query, i + <span class="hljs-number">1</span>, entry.chr, entry.pos, alt, is_snp, callback);
+        });
+    };
+
+    <span class="hljs-keyword">let</span> insert_variants = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO variants (SampleID, Chromosome, Position, ChromosomeCopy, AlternateID) VALUES (?,?,?,?,?)'</span>;
+        entry.sampleinfo.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">variant</span>) </span>{
+            variant.GT.split(<span class="hljs-string">'/'</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v, j</span>) </span>{
+                <span class="hljs-keyword">let</span> alt = (v == <span class="hljs-string">'.'</span>) ? <span class="hljs-literal">null</span> : <span class="hljs-built_in">parseInt</span>(v);
+                db.run(query, variant.NAME, entry.chr, entry.pos, j + <span class="hljs-number">1</span>, alt, callback);
+            });
+        });
+    };
+
+    <span class="hljs-keyword">let</span> insert_entry = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+        insert_alternates(entry, callback);
+        insert_variants(entry, callback);
+    };
+
+    <span class="hljs-keyword">let</span> insert_environment = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">env, callback</span>) </span>{
+        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO environment (SampleID, Name, Value) VALUES (?,?,?)'</span>;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> sampleid <span class="hljs-keyword">in</span> env) {
+            <span class="hljs-keyword">let</span> data = env[sampleid];
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> name <span class="hljs-keyword">in</span> data) {
+                <span class="hljs-keyword">let</span> value = (data[name].length === <span class="hljs-number">0</span>) ? <span class="hljs-literal">null</span> : data[name];
+                db.run(query, sampleid, name, value, callback);
+            }
+        }
+    };
+
+    <span class="hljs-keyword">let</span> query = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">sid, chr, pos, callback</span>) </span>{
+        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?'</span>;
+
+        <span class="hljs-keyword">let</span> result = {
+            SampleId: sid,
+            Chromosome: chr,
+            Position: pos,
+            Alternates: [],
+            Environment: {}
+        };
+
+        db.all(query, sid, chr, pos, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, entries</span>) </span>{
+            <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
+                callback(err);
+            }
+            entries.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+                result.Alternates[entry.ChromosomeCopy - <span class="hljs-number">1</span>] = entry.Alternate;
+                result.Environment[entry.Name] = entry.Value;
+            });
+            callback(<span class="hljs-literal">null</span>, result);
+        });
+    };
+
+    <span class="hljs-keyword">return</span> { close, insert_entry, insert_environment, query };
+};</div></div></div></div></body></html>

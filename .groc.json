@@ -1,0 +1,9 @@
+{
+  "glob": ["README.md", "main.js", "src/*.js"],
+  "out": "docs",
+  "github": false,
+  "empty-lines": false,
+  "index-page-title": "Jenna",
+  "only-render-newer": false,
+  "repository-url": "https://github.com/dglmoore/jenna"
+}
