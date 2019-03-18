@@ -4,7 +4,7 @@
 const jdb = require('./database');
 
 module.exports = function(sid, chr, pos, cmd) {
-    var db = new jdb.Database(cmd.database, function(err) {
+    let db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
             throw err;
         }
@@ -14,6 +14,6 @@ module.exports = function(sid, chr, pos, cmd) {
         if (err !== null) {
             throw err;
         }
-        console.log(data);
+        process.stdout.write(data + '\n');
     });
 };

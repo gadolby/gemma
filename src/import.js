@@ -6,17 +6,17 @@ const jdb = require('./database');
 const vcf = require('bionode-vcf');
 const csv = require('csv');
 
-var import_vcf = function(filename, cmd) {
-    var db = new jdb.Database(cmd.database, function(err) {
+let import_vcf = function(filename, cmd) {
+    let db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
-            console.error(err);
+            process.stderr.write(err + '\n');
         }
     });
 
     process.stdout.write(`Importing VCF file ${filename}... `);
     vcf.read(filename);
 
-    var n = 0;
+    let n = 0;
     vcf.on('data', function(entry) {
         n += 1;
 
@@ -28,19 +28,17 @@ var import_vcf = function(filename, cmd) {
     });
 
     vcf.on('error', function(err) {
-        console.error(err);
+        process.stderr.write(err + '\n');
         process.exit(1);
     });
 
-    vcf.on('end', function(err) {
-        process.stdout.write(`done. (${n} entries)`);
-    });
+    vcf.on('end', () => process.stdout.write(`done. (${n} entries)\n`));
 };
 
-var import_env = function(filename, cmd) {
-    var db = new jdb.Database(cmd.database, function(err) {
+let import_env = function(filename, cmd) {
+    let db = new jdb.Database(cmd.database, function(err) {
         if (err !== null) {
-            console.error(err);
+            process.stderr.write(err + '\n');
         }
     });
 
@@ -61,14 +59,14 @@ var import_env = function(filename, cmd) {
                 throw new Error('Environmental data does not include SampleIDs');
             }
 
-            samples = [];
-            for (var i = 1; i < data.length; ++i) {
+            let samples = [];
+            for (let i = 1; i < data.length; ++i) {
                 let sid = data[i][sampleid_index];
                 if (sid in samples) {
                     throw new Error(`duplicate SampleID ${sid}`);
                 }
                 samples[sid] = {};
-                for (var j = 0; j < data[i].length; ++j) {
+                for (let j = 0; j < data[i].length; ++j) {
                     if (j != sampleid_index) {
                         samples[sid][data[0][j]] = data[i][j];
                     }
@@ -77,7 +75,7 @@ var import_env = function(filename, cmd) {
 
             db.insert_environment(samples, function(err) {
                 if (err !== null) {
-                    console.error(err);
+                    process.stderr.write(err + '\n');
                     process.exit(1);
                 }
             });

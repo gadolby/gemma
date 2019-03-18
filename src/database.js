@@ -8,7 +8,7 @@ const snip_test = function(...alts) {
 };
 
 module.exports.Database = function(filename = 'jenna.db', callback) {
-    var db = new sqlite3.Database(filename, function(err) {
+    let db = new sqlite3.Database(filename, function(err) {
         if (err !== null) {
             callback(err);
         } else {
@@ -20,11 +20,11 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
         }
     });
 
-    var close = function(callback) {
+    let close = function(callback) {
         db.close(callback);
     };
 
-    var insert_alternates = function(entry, callback) {
+    let insert_alternates = function(entry, callback) {
         let query = 'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)',
             alts = entry.alt.split(','),
             is_snp = snip_test(entry.ref, ...alts);
@@ -35,33 +35,33 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
         });
     };
 
-    var insert_variants = function(entry, callback) {
+    let insert_variants = function(entry, callback) {
         let query = 'INSERT INTO variants (SampleID, Chromosome, Position, ChromosomeCopy, AlternateID) VALUES (?,?,?,?,?)';
-        entry.sampleinfo.forEach(function(variant, i) {
+        entry.sampleinfo.forEach(function(variant) {
             variant.GT.split('/').forEach(function(v, j) {
-                var alt = (v == '.') ? null : parseInt(v);
-                db.run(query, variant.NAME, entry.chr, entry.pos, j + 1, alt);
+                let alt = (v == '.') ? null : parseInt(v);
+                db.run(query, variant.NAME, entry.chr, entry.pos, j + 1, alt, callback);
             });
         });
     };
 
-    var insert_entry = function(entry, callback) {
+    let insert_entry = function(entry, callback) {
         insert_alternates(entry, callback);
         insert_variants(entry, callback);
     };
 
-    var insert_environment = function(env, callback) {
+    let insert_environment = function(env, callback) {
         let query = 'INSERT INTO environment (SampleID, Name, Value) VALUES (?,?,?)';
-        for (var sampleid in env) {
+        for (let sampleid in env) {
             let data = env[sampleid];
-            for (var name in data) {
+            for (let name in data) {
                 let value = (data[name].length === 0) ? null : data[name];
                 db.run(query, sampleid, name, value, callback);
             }
         }
     };
 
-    var query = function(sid, chr, pos, callback) {
+    let query = function(sid, chr, pos, callback) {
         let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
 
         let result = {
@@ -84,9 +84,5 @@ module.exports.Database = function(filename = 'jenna.db', callback) {
         });
     };
 
-    return {
-        insert_entry: insert_entry,
-        insert_environment: insert_environment,
-        query: query
-    };
+    return { close, insert_entry, insert_environment, query };
 };

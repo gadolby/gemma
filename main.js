@@ -28,13 +28,13 @@ program
     .action(jenna.query);
 
 program.on('command:*', function() {
-    console.error(program.helpInformation());
+    process.stdout.write(program.helpInformation() + '\n');
     process.exit(1);
 });
 
 program.parse(process.argv);
 
 if (process.argv.length == 2) {
-    console.error(program.helpInformation());
+    process.stderr.write(program.helpInformation() + '\n');
     process.exit(1);
 }
