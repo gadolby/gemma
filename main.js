@@ -22,7 +22,7 @@ program
     .command('query <sampleid> <chromosome> <position>')
     .option('-d, --database <filename>', 'Database filename', './jenna.db')
     .description('Query the database for entries')
-    .action(jenna.query.query);
+    .action(jenna.query);
 
 program.on('command:*', function() {
     process.stdout.write(program.helpInformation() + '\n');
