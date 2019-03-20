@@ -81,5 +81,11 @@ module.exports.Database = function(filename = 'gemma.db', callback) {
         });
     };
 
-    return { close, insert_entry, insert_environment, query };
+    return Object.create({
+        get handle() {
+            return db;
+        },
+
+        close, insert_entry, insert_environment, query
+    });
 };
