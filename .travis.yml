@@ -1,0 +1,25 @@
+matrix:
+  include:
+    - os: linux
+    - os: osx
+      osx_image: xcode9.4
+
+language: node_js
+node_js:
+  - "10.15.1"
+sudo: required
+
+cache:
+  directories:
+    - node_modules
+
+install:
+  - npm install
+  - npm install -g codecov
+
+script:
+  - npm test
+  - npm run lint
+
+after_success:
+  - codecov
