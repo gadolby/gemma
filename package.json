@@ -1,5 +1,5 @@
 {
-    "name": "jenna",
+    "name": "gemma",
     "version": "0.0.0",
     "description": "Mapping genomic data and such",
     "main": "main.js",
@@ -9,7 +9,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/dglmoore/jenna.git"
+        "url": "git+https://github.com/dglmoore/gemma.git"
     },
     "author": "Douglas G. Moore <doug@dglmoore.com>",
     "contributors": [
@@ -17,9 +17,9 @@
     ],
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/dglmoore/jenna/issues"
+        "url": "https://github.com/dglmoore/gemma/issues"
     },
-    "homepage": "https://dglmoore.github.io/jenna",
+    "homepage": "https://dglmoore.github.io/gemma",
     "devDependencies": {
         "eslint": "^5.15.2",
         "eslint-plugin-jest": "^22.4.1",

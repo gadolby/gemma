@@ -4,7 +4,7 @@ const snip_test = function(...alts) {
     return alts.every(a => ['A','T','C','G'].find(b => a == b.toUpperCase()));
 };
 
-module.exports.Database = function(filename = 'jenna.db', callback) {
+module.exports.Database = function(filename = 'gemma.db', callback) {
     let db = new sqlite3.Database(filename, function(err) {
         if (err !== null) {
             callback(err);

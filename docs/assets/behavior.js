@@ -13,21 +13,21 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "commentsOnly": true,
           "name": "Markdown"
         },
-        "sourcePath": "/home/ec2-user/jenna/README.md",
+        "sourcePath": "/home/ec2-user/gemma/README.md",
         "projectPath": "README.md",
         "targetPath": "index",
-        "pageTitle": "Jenna",
+        "pageTitle": "Gemma",
         "firstHeader": {
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "jenna",
-            "slug": "jenna",
+            "title": "Gemma",
+            "slug": "gemma",
             "isFileHeader": true
           },
           "depth": 1
         },
-        "title": "jenna"
+        "title": "Gemma"
       },
       "depth": 1,
       "outline": []
@@ -43,7 +43,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "foldPrefix": "^",
           "name": "JavaScript"
         },
-        "sourcePath": "/home/ec2-user/jenna/src/database.js",
+        "sourcePath": "/home/ec2-user/gemma/src/database.js",
         "projectPath": "src/database.js",
         "targetPath": "database",
         "pageTitle": "database",
@@ -63,7 +63,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "foldPrefix": "^",
           "name": "JavaScript"
         },
-        "sourcePath": "/home/ec2-user/jenna/src/import.js",
+        "sourcePath": "/home/ec2-user/gemma/src/import.js",
         "projectPath": "src/import.js",
         "targetPath": "import",
         "pageTitle": "import",
@@ -83,7 +83,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "foldPrefix": "^",
           "name": "JavaScript"
         },
-        "sourcePath": "/home/ec2-user/jenna/main.js",
+        "sourcePath": "/home/ec2-user/gemma/main.js",
         "projectPath": "main.js",
         "targetPath": "main",
         "pageTitle": "main",
@@ -103,7 +103,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "foldPrefix": "^",
           "name": "JavaScript"
         },
-        "sourcePath": "/home/ec2-user/jenna/src/query.js",
+        "sourcePath": "/home/ec2-user/gemma/src/query.js",
         "projectPath": "src/query.js",
         "targetPath": "query",
         "pageTitle": "query",

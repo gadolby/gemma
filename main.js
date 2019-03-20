@@ -1,5 +1,5 @@
 const program = require('commander');
-const jenna = {
+const gemma = {
     import: require('./src/import'),
     query: require('./src/query')
 };
@@ -8,21 +8,21 @@ program.version('0.0.0', '-v, --version');
 
 program
     .command('import-vcf <vcf-filename>')
-    .option('-d, --database <filename>', 'Database filename', './jenna.db')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import VCF file into database')
-    .action(jenna.import.vcf);
+    .action(gemma.import.vcf);
 
 program
     .command('import-env <csv-filename>')
-    .option('-d, --database <filename>', 'Database filename', './jenna.db')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import environmental data into database')
-    .action(jenna.import.env);
+    .action(gemma.import.env);
 
 program
     .command('query <sampleid> <chromosome> <position>')
-    .option('-d, --database <filename>', 'Database filename', './jenna.db')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Query the database for entries')
-    .action(jenna.query);
+    .action(gemma.query);
 
 program.on('command:*', function() {
     process.stdout.write(program.helpInformation() + '\n');
