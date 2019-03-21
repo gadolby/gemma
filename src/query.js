@@ -1,10 +1,11 @@
+const chalk = require('chalk');
 const jdb = require('./database');
 
 const listSamples = function(cmd) {
     return jdb.Database(cmd.database)
         .then(db => db.list('variants', 'SampleID', { distinct: true }))
         .then(function(data) {
-            process.stdout.write(data.length + ' samples found\n');
+            process.stdout.write(chalk.underline(chalk.bold(data.length) + ' samples found\n\n'));
             data.forEach(entry => process.stdout.write('  ' + entry + '\n'));
         });
 };
