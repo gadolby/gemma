@@ -4,12 +4,8 @@ const vcf = require('bionode-vcf');
 const gff = require('bionode-gff');
 const csv = require('csv');
 
-let import_vcf = function(filename, cmd) {
-    let db = new jdb.Database(cmd.database, function(err) {
-        if (err !== null) {
-            process.stderr.write(err + '\n');
-        }
-    });
+let import_vcf = async function(filename, cmd) {
+    let db = await jdb.Database(cmd.database);
 
     process.stdout.write(`Importing VCF file ${filename}... `);
     vcf.read(filename);
@@ -17,28 +13,18 @@ let import_vcf = function(filename, cmd) {
     let n = 0;
     vcf.on('data', function(entry) {
         n += 1;
-
-        db.insert_entry(entry, function(err) {
-            if (err !== null) {
-                vcf.emit('error', err);
-            }
-        });
+        db.insert_entry(entry).catch(err => vcf.emit('error', err));
     });
 
     vcf.on('error', function(err) {
-        process.stderr.write(err + '\n');
-        process.exit(1);
+        throw err;
     });
 
     vcf.on('end', () => process.stdout.write(`done. (${n} entries)\n`));
 };
 
-let import_gff = function(filename, cmd) {
-    let db = new jdb.Database(cmd.database, function(err) {
-        if (err !== null) {
-            process.stderr.write(err + '\n');
-        }
-    });
+let import_gff = async function(filename, cmd) {
+    let db = await jdb.Database(cmd.database);
 
     process.stdout.write(`Importing features from GFF file ${filename}...`);
     const g = gff.read(filename);
@@ -47,11 +33,7 @@ let import_gff = function(filename, cmd) {
     g.on('data', function(entry) {
         n += 1;
 
-        db.insert_gene_feature(entry, function(err) {
-            if (err !== null) {
-                g.emit('error', err);
-            }
-        });
+        db.insert_gene_feature(entry).catch(err => g.emit('error', err));
     });
 
     g.on('error', function(err) {
@@ -62,12 +44,8 @@ let import_gff = function(filename, cmd) {
     g.on('end', () => process.stdout.write(`done. (${n} features)\n`));
 };
 
-let import_env = function(filename, cmd) {
-    let db = new jdb.Database(cmd.database, function(err) {
-        if (err !== null) {
-            process.stderr.write(err + '\n');
-        }
-    });
+let import_env = async function(filename, cmd) {
+    let db = await jdb.Database(cmd.database);
 
     fs.readFile(filename, function(err, data) {
         if (err !== null) {
@@ -100,7 +78,7 @@ let import_env = function(filename, cmd) {
                 }
             }
 
-            db.insert_environment(samples, function(err) {
+            db.insert_environment(samples).catch(function(err) {
                 if (err !== null) {
                     process.stderr.write(err + '\n');
                     process.exit(1);

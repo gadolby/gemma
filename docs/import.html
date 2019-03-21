@@ -4,12 +4,8 @@
 <span class="hljs-keyword">const</span> gff = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-gff'</span>);
 <span class="hljs-keyword">const</span> csv = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csv'</span>);
 
-<span class="hljs-keyword">let</span> import_vcf = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> jdb.Database(cmd.database, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
-            process.stderr.write(err + <span class="hljs-string">'\n'</span>);
-        }
-    });
+<span class="hljs-keyword">let</span> import_vcf = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>... `</span>);
     vcf.read(filename);
@@ -17,28 +13,18 @@
     <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
     vcf.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         n += <span class="hljs-number">1</span>;
-
-        db.insert_entry(entry, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-            <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
-                vcf.emit(<span class="hljs-string">'error'</span>, err);
-            }
-        });
+        db.insert_entry(entry).catch(err =&gt; vcf.emit(<span class="hljs-string">'error'</span>, err));
     });
 
     vcf.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-        process.stderr.write(err + <span class="hljs-string">'\n'</span>);
-        process.exit(<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">throw</span> err;
     });
 
     vcf.on(<span class="hljs-string">'end'</span>, () =&gt; process.stdout.write(<span class="hljs-string">`done. (<span class="hljs-subst">${n}</span> entries)\n`</span>));
 };
 
-<span class="hljs-keyword">let</span> import_gff = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> jdb.Database(cmd.database, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
-            process.stderr.write(err + <span class="hljs-string">'\n'</span>);
-        }
-    });
+<span class="hljs-keyword">let</span> import_gff = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     process.stdout.write(<span class="hljs-string">`Importing features from GFF file <span class="hljs-subst">${filename}</span>...`</span>);
     <span class="hljs-keyword">const</span> g = gff.read(filename);
@@ -47,11 +33,7 @@
     g.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         n += <span class="hljs-number">1</span>;
 
-        db.insert_gene_feature(entry, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-            <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
-                g.emit(<span class="hljs-string">'error'</span>, err);
-            }
-        });
+        db.insert_gene_feature(entry).catch(err =&gt; g.emit(<span class="hljs-string">'error'</span>, err));
     });
 
     g.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
@@ -62,12 +44,8 @@
     g.on(<span class="hljs-string">'end'</span>, () =&gt; process.stdout.write(<span class="hljs-string">`done. (<span class="hljs-subst">${n}</span> features)\n`</span>));
 };
 
-<span class="hljs-keyword">let</span> import_env = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">new</span> jdb.Database(cmd.database, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-        <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
-            process.stderr.write(err + <span class="hljs-string">'\n'</span>);
-        }
-    });
+<span class="hljs-keyword">let</span> import_env = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     fs.readFile(filename, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, data</span>) </span>{
         <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
@@ -100,7 +78,7 @@
                 }
             }
 
-            db.insert_environment(samples, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+            db.insert_environment(samples).catch(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
                 <span class="hljs-keyword">if</span> (err !== <span class="hljs-literal">null</span>) {
                     process.stderr.write(err + <span class="hljs-string">'\n'</span>);
                     process.exit(<span class="hljs-number">1</span>);

@@ -1,105 +1,101 @@
-const sqlite3 = require('sqlite3').verbose();
+const sqlite = require('sqlite');
 
 const snip_test = function(...alts) {
     return alts.every(a => ['A','T','C','G'].find(b => a == b.toUpperCase()));
 };
 
-module.exports.Database = function(filename = 'gemma.db', callback) {
-    let db = new sqlite3.Database(filename, function(err) {
-        if (err !== null) {
-            callback(err);
-        } else {
-            this.run('pragma synchronous = OFF', callback);
-            this.run('pragma journal_mode = MEMORY', callback);
-            this.run('CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))', callback);
-            this.run('CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))', callback);
-            this.run('CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))', callback);
-            this.run('CREATE TABLE IF NOT EXISTS genes (GeneID string, Source string, Start int, End int, Note string, PRIMARY KEY (GeneID))', callback);
-            this.run('CREATE TABLE IF NOT EXISTS subgenes (GeneID string, ID string, Source string, Type string, Start int, End int, Note string)', callback);
-        }
-    });
+module.exports.Database = async function(filename = 'gemma.db', callback) {
+    let db = await sqlite.open(filename, { verbose: true });
 
-    let close = function(callback) {
-        db.close(callback);
-    };
+    await Promise.all([
+        db.run('pragma synchronous = OFF'),
+        db.run('pragma journal_mode = MEMORY'),
+        db.run('CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))'),
+        db.run('CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))'),
+        db.run('CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))'),
+        db.run('CREATE TABLE IF NOT EXISTS genes (GeneID string, Source string, Start int, End int, Note string, PRIMARY KEY (GeneID))'),
+        db.run('CREATE TABLE IF NOT EXISTS subgenes (GeneID string, ID string, Source string, Type string, Start int, End int, Note string)')
+    ]);
 
-    let insert_alternates = function(entry, callback) {
+    let close = () => db.close();
+
+    let insert_alternates = async function(entry) {
         let query = 'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)',
             alts = entry.alt.split(','),
             is_snp = snip_test(entry.ref, ...alts);
 
-        db.run(query, 0, entry.chr, entry.pos, entry.ref, is_snp, callback);
+        let promises = [db.run(query, 0, entry.chr, entry.pos, entry.ref, is_snp)];
         alts.forEach(function(alt, i) {
-            db.run(query, i + 1, entry.chr, entry.pos, alt, is_snp, callback);
+            promises.push(db.run(query, i + 1, entry.chr, entry.pos, alt, is_snp));
         });
+        return Promise.all(promises);
     };
 
-    let insert_variants = function(entry, callback) {
+    let insert_variants = async function(entry) {
         let query = 'INSERT INTO variants (SampleID, Chromosome, Position, ChromosomeCopy, AlternateID) VALUES (?,?,?,?,?)';
+        let promises = [];
         entry.sampleinfo.forEach(function(variant) {
             variant.GT.split('/').forEach(function(v, j) {
                 let alt = (v == '.') ? null : parseInt(v);
-                db.run(query, variant.NAME, entry.chr, entry.pos, j + 1, alt, callback);
+                promises.push(db.run(query, variant.NAME, entry.chr, entry.pos, j + 1, alt));
             });
         });
+        return Promise.all(promises);
     };
 
-    let insert_entry = function(entry, callback) {
-        insert_alternates(entry, callback);
-        insert_variants(entry, callback);
+    let insert_entry = async function(entry) {
+        return Promise.all([ insert_alternates(entry), insert_variants(entry) ]);
     };
 
-    let insert_environment = function(env, callback) {
+    let insert_environment = async function(env) {
         let query = 'INSERT INTO environment (SampleID, Name, Value) VALUES (?,?,?)';
+        let promises = [];
         for (let sampleid in env) {
             let data = env[sampleid];
             for (let name in data) {
                 let value = (data[name].length === 0) ? null : data[name];
-                db.run(query, sampleid, name, value, callback);
+                promises.push(db.run(query, sampleid, name, value));
             }
         }
+        return Promise.all(promises);
     };
 
-    let insert_gene = function(entry, callback) {
+    let insert_gene = async function(entry) {
         let query = 'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)';
         const { ID, Note } = entry.attributes;
-        db.run(query, ID, entry.type, entry.start, entry.end, Note, callback);
+        return db.run(query, ID, entry.type, entry.start, entry.end, Note);
     };
 
-    let insert_subgene = function(entry, callback) {
+    let insert_subgene = async function(entry) {
         let query = 'INSERT INTO subgenes (GeneID, ID, Source, Type, Start, End, Note) VALUES (?,?,?,?,?,?,?)';
         const { Parent, ID, Note } = entry.attributes;
-        db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note, callback);
+        return db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note);
     };
 
-    let insert_gene_feature = function(entry, callback) {
+    let insert_gene_feature = async function(entry) {
         if (entry.type.toLowerCase() === 'gene') {
-            insert_gene(entry, callback);
+            return insert_gene(entry, callback);
         } else {
-            insert_subgene(entry, callback);
+            return insert_subgene(entry, callback);
         }
     };
 
-    let query = function(sid, chr, pos, callback) {
+    let query = async function(sid, chr, pos) {
         let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
 
-        let result = {
-            SampleId: sid,
-            Chromosome: chr,
-            Position: pos,
-            Alternates: [],
-            Environment: {}
-        };
-
-        db.all(query, sid, chr, pos, function(err, entries) {
-            if (err !== null) {
-                callback(err);
-            }
+        return db.all(query, sid, chr, pos).then(function(entries) {
+            let result = {
+                SampleId: sid,
+                Chromosome: chr,
+                Position: pos,
+                Alternates: [],
+                Environment: {}
+            };
             entries.forEach(function(entry) {
                 result.Alternates[entry.ChromosomeCopy - 1] = entry.Alternate;
                 result.Environment[entry.Name] = entry.Value;
             });
-            callback(null, result);
+            return result;
         });
     };
 

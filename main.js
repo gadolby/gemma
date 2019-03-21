@@ -41,3 +41,8 @@ if (process.argv.length == 2) {
     process.stderr.write(program.helpInformation() + '\n');
     process.exit(1);
 }
+
+process.on('unhandledRejection', function(err) {
+    process.stderr.write(err.stack + '\n');
+    process.exit(1);
+});

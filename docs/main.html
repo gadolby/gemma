@@ -40,4 +40,9 @@ program.parse(process.argv);
 <span class="hljs-keyword">if</span> (process.argv.length == <span class="hljs-number">2</span>) {
     process.stderr.write(program.helpInformation() + <span class="hljs-string">'\n'</span>);
     process.exit(<span class="hljs-number">1</span>);
-}</div></div></div></div></body></html>
+}
+
+process.on(<span class="hljs-string">'unhandledRejection'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+    process.stderr.write(err.stack + <span class="hljs-string">'\n'</span>);
+    process.exit(<span class="hljs-number">1</span>);
+});</div></div></div></div></body></html>
