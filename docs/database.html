@@ -84,18 +84,22 @@
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?'</span>;
 
         <span class="hljs-keyword">return</span> db.all(query, sid, chr, pos).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entries</span>) </span>{
-            <span class="hljs-keyword">let</span> result = {
-                SampleId: sid,
-                Chromosome: chr,
-                Position: pos,
-                Alternates: [],
-                Environment: {}
-            };
-            entries.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
-                result.Alternates[entry.ChromosomeCopy - <span class="hljs-number">1</span>] = entry.Alternate;
-                result.Environment[entry.Name] = entry.Value;
-            });
-            <span class="hljs-keyword">return</span> result;
+            <span class="hljs-keyword">if</span> (entries !== <span class="hljs-literal">undefined</span> &amp;&amp; entries.length !== <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">let</span> result = {
+                    SampleId: sid,
+                    Chromosome: chr,
+                    Position: pos,
+                    Alternates: [],
+                    Environment: {}
+                };
+                entries.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+                    result.Alternates[entry.ChromosomeCopy - <span class="hljs-number">1</span>] = entry.Alternate;
+                    result.Environment[entry.Name] = entry.Value;
+                });
+                <span class="hljs-keyword">return</span> result;
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">return</span> {};
+            }
         });
     };
 

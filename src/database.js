@@ -84,18 +84,22 @@ module.exports.Database = async function(filename = 'gemma.db', callback) {
         let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
 
         return db.all(query, sid, chr, pos).then(function(entries) {
-            let result = {
-                SampleId: sid,
-                Chromosome: chr,
-                Position: pos,
-                Alternates: [],
-                Environment: {}
-            };
-            entries.forEach(function(entry) {
-                result.Alternates[entry.ChromosomeCopy - 1] = entry.Alternate;
-                result.Environment[entry.Name] = entry.Value;
-            });
-            return result;
+            if (entries !== undefined && entries.length !== 0) {
+                let result = {
+                    SampleId: sid,
+                    Chromosome: chr,
+                    Position: pos,
+                    Alternates: [],
+                    Environment: {}
+                };
+                entries.forEach(function(entry) {
+                    result.Alternates[entry.ChromosomeCopy - 1] = entry.Alternate;
+                    result.Environment[entry.Name] = entry.Value;
+                });
+                return result;
+            } else {
+                return {};
+            }
         });
     };
 
