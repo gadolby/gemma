@@ -5,7 +5,17 @@
     <span class="hljs-keyword">return</span> jdb.Database(cmd.database)
         .then(db =&gt; db.list(<span class="hljs-string">'variants'</span>, <span class="hljs-string">'SampleID'</span>, { distinct: <span class="hljs-literal">true</span> }))
         .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+            data.sort();
             process.stdout.write(chalk.underline(chalk.bold(data.length) + <span class="hljs-string">' samples found\n\n'</span>));
+            data.forEach(entry =&gt; process.stdout.write(<span class="hljs-string">'  '</span> + entry + <span class="hljs-string">'\n'</span>));
+        });
+};
+
+<span class="hljs-keyword">const</span> listChromosomes = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cmd</span>) </span>{
+    <span class="hljs-keyword">return</span> jdb.Database(cmd.database)
+        .then(db =&gt; db.list(<span class="hljs-string">'variants'</span>, <span class="hljs-string">'Chromosome'</span>, { distinct: <span class="hljs-literal">true</span> }))
+        .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+            process.stdout.write(chalk.underline(chalk.bold(data.length) + <span class="hljs-string">' chromosomes found\n\n'</span>));
             data.forEach(entry =&gt; process.stdout.write(<span class="hljs-string">'  '</span> + entry + <span class="hljs-string">'\n'</span>));
         });
 };
@@ -16,4 +26,4 @@
         .then(data =&gt; process.stdout.write(<span class="hljs-built_in">JSON</span>.stringify(data, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>) + <span class="hljs-string">'\n'</span>));
 };
 
-<span class="hljs-built_in">module</span>.exports = { listSamples, query };</div></div></div></div></body></html>
+<span class="hljs-built_in">module</span>.exports = { listChromosomes, listSamples, query };</div></div></div></div></body></html>

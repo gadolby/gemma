@@ -35,6 +35,13 @@ program
     .action(gemma.query.listSamples);
 
 program
+    .command(<span class="hljs-string">'list-chromosomes'</span>)
+    .alias(<span class="hljs-string">'lsc'</span>)
+    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
+    .description(<span class="hljs-string">'List the distinct chromosomes'</span>)
+    .action(gemma.query.listChromosomes);
+
+program
     .command(<span class="hljs-string">'query &lt;sampleid&gt; &lt;chromosome&gt; &lt;position&gt;'</span>)
     .alias(<span class="hljs-string">'q'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)

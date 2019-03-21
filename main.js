@@ -35,6 +35,13 @@ program
     .action(gemma.query.listSamples);
 
 program
+    .command('list-chromosomes')
+    .alias('lsc')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
+    .description('List the distinct chromosomes')
+    .action(gemma.query.listChromosomes);
+
+program
     .command('query <sampleid> <chromosome> <position>')
     .alias('q')
     .option('-d, --database <filename>', 'Database filename', './gemma.db')
