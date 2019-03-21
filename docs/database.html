@@ -60,19 +60,19 @@
         }
     };
 
-    insert_gene = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+    <span class="hljs-keyword">let</span> insert_gene = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)'</span>;
         <span class="hljs-keyword">const</span> { ID, Note } = entry.attributes;
         db.run(query, ID, entry.type, entry.start, entry.end, Note, callback);
     };
 
-    insert_subgene = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+    <span class="hljs-keyword">let</span> insert_subgene = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO subgenes (GeneID, ID, Source, Type, Start, End, Note) VALUES (?,?,?,?,?,?,?)'</span>;
         <span class="hljs-keyword">const</span> { Parent, ID, Note } = entry.attributes;
         db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note, callback);
     };
 
-    insert_gene_feature = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
+    <span class="hljs-keyword">let</span> insert_gene_feature = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry, callback</span>) </span>{
         <span class="hljs-keyword">if</span> (entry.type.toLowerCase() === <span class="hljs-string">'gene'</span>) {
             insert_gene(entry, callback);
         } <span class="hljs-keyword">else</span> {

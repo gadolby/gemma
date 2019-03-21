@@ -60,19 +60,19 @@ module.exports.Database = function(filename = 'gemma.db', callback) {
         }
     };
 
-    insert_gene = function(entry, callback) {
+    let insert_gene = function(entry, callback) {
         let query = 'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)';
         const { ID, Note } = entry.attributes;
         db.run(query, ID, entry.type, entry.start, entry.end, Note, callback);
     };
 
-    insert_subgene = function(entry, callback) {
+    let insert_subgene = function(entry, callback) {
         let query = 'INSERT INTO subgenes (GeneID, ID, Source, Type, Start, End, Note) VALUES (?,?,?,?,?,?,?)';
         const { Parent, ID, Note } = entry.attributes;
         db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note, callback);
     };
 
-    insert_gene_feature = function(entry, callback) {
+    let insert_gene_feature = function(entry, callback) {
         if (entry.type.toLowerCase() === 'gene') {
             insert_gene(entry, callback);
         } else {
