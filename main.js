@@ -9,7 +9,7 @@ program.version('0.0.0', '-v, --version');
 program
     .command('import-vcf <vcf-filename>')
     .option('-d, --database <filename>', 'Database filename', './gemma.db')
-    .description('Import VCF file into database')
+    .description('Import a VCF file into database')
     .action(gemma.import.vcf);
 
 program
@@ -17,6 +17,12 @@ program
     .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import environmental data into database')
     .action(gemma.import.env);
+
+program
+    .command('import-gff <gff-filename>')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
+    .description('Import features from a GFF file into database')
+    .action(gemma.import.gff);
 
 program
     .command('query <sampleid> <chromosome> <position>')

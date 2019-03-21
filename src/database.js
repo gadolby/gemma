@@ -14,6 +14,8 @@ module.exports.Database = function(filename = 'gemma.db', callback) {
             this.run('CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))', callback);
             this.run('CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))', callback);
             this.run('CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))', callback);
+            this.run('CREATE TABLE IF NOT EXISTS genes (GeneID string, Source string, Start int, End int, Note string, PRIMARY KEY (GeneID))', callback);
+            this.run('CREATE TABLE IF NOT EXISTS subgenes (GeneID string, ID string, Source string, Type string, Start int, End int, Note string)', callback);
         }
     });
 
@@ -58,6 +60,26 @@ module.exports.Database = function(filename = 'gemma.db', callback) {
         }
     };
 
+    insert_gene = function(entry, callback) {
+        let query = 'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)';
+        const { ID, Note } = entry.attributes;
+        db.run(query, ID, entry.type, entry.start, entry.end, Note, callback);
+    };
+
+    insert_subgene = function(entry, callback) {
+        let query = 'INSERT INTO subgenes (GeneID, ID, Source, Type, Start, End, Note) VALUES (?,?,?,?,?,?,?)';
+        const { Parent, ID, Note } = entry.attributes;
+        db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note, callback);
+    };
+
+    insert_gene_feature = function(entry, callback) {
+        if (entry.type.toLowerCase() === 'gene') {
+            insert_gene(entry, callback);
+        } else {
+            insert_subgene(entry, callback);
+        }
+    };
+
     let query = function(sid, chr, pos, callback) {
         let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
 
@@ -86,6 +108,6 @@ module.exports.Database = function(filename = 'gemma.db', callback) {
             return db;
         },
 
-        close, insert_entry, insert_environment, query
+        close, insert_entry, insert_environment, insert_gene_feature, query
     });
 };

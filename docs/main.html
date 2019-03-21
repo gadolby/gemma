@@ -9,7 +9,7 @@ program.version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-stri
 program
     .command(<span class="hljs-string">'import-vcf &lt;vcf-filename&gt;'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
-    .description(<span class="hljs-string">'Import VCF file into database'</span>)
+    .description(<span class="hljs-string">'Import a VCF file into database'</span>)
     .action(gemma.import.vcf);
 
 program
@@ -17,6 +17,12 @@ program
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import environmental data into database'</span>)
     .action(gemma.import.env);
+
+program
+    .command(<span class="hljs-string">'import-gff &lt;gff-filename&gt;'</span>)
+    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
+    .description(<span class="hljs-string">'Import features from a GFF file into database'</span>)
+    .action(gemma.import.gff);
 
 program
     .command(<span class="hljs-string">'query &lt;sampleid&gt; &lt;chromosome&gt; &lt;position&gt;'</span>)

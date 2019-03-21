@@ -1,6 +1,7 @@
 const fs = require('fs');
 const jdb = require('./database');
 const vcf = require('bionode-vcf');
+const gff = require('bionode-gff');
 const csv = require('csv');
 
 let import_vcf = function(filename, cmd) {
@@ -30,6 +31,35 @@ let import_vcf = function(filename, cmd) {
     });
 
     vcf.on('end', () => process.stdout.write(`done. (${n} entries)\n`));
+};
+
+let import_gff = function(filename, cmd) {
+    let db = new jdb.Database(cmd.database, function(err) {
+        if (err !== null) {
+            process.stderr.write(err + '\n');
+        }
+    });
+
+    process.stdout.write(`Importing features from GFF file ${filename}...`);
+    const g = gff.read(filename);
+
+    let n = 0;
+    g.on('data', function(entry) {
+        n += 1;
+
+        db.insert_gene_feature(entry, function(err) {
+            if (err !== null) {
+                g.emit('error', err);
+            }
+        });
+    });
+
+    g.on('error', function(err) {
+        process.stderr.write(err + '\n');
+        process.exit(1);
+    });
+
+    g.on('end', () => process.stdout.write(`done. (${n} features)\n`));
 };
 
 let import_env = function(filename, cmd) {
@@ -82,5 +112,6 @@ let import_env = function(filename, cmd) {
 
 module.exports = {
     vcf: import_vcf,
+    gff: import_gff,
     env: import_env
 };
