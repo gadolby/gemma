@@ -8,30 +8,35 @@ program.version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-stri
 
 program
     .command(<span class="hljs-string">'import-vcf &lt;vcf-filename&gt;'</span>)
+    .alias(<span class="hljs-string">'iv'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import a VCF file into database'</span>)
     .action(gemma.import.vcf);
 
 program
     .command(<span class="hljs-string">'import-env &lt;csv-filename&gt;'</span>)
+    .alias(<span class="hljs-string">'ie'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import environmental data into database'</span>)
     .action(gemma.import.env);
 
 program
     .command(<span class="hljs-string">'import-gff &lt;gff-filename&gt;'</span>)
+    .alias(<span class="hljs-string">'ig'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import features from a GFF file into database'</span>)
     .action(gemma.import.gff);
 
 program
     .command(<span class="hljs-string">'list-samples'</span>)
+    .alias(<span class="hljs-string">'lss'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'List the distinct sample IDs'</span>)
     .action(gemma.query.listSamples);
 
 program
     .command(<span class="hljs-string">'query &lt;sampleid&gt; &lt;chromosome&gt; &lt;position&gt;'</span>)
+    .alias(<span class="hljs-string">'q'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Query the database for entries'</span>)
     .action(gemma.query.query);
