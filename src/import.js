@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const jdb = require('./database');
 const vcf = require('bionode-vcf');
 const gff = require('bionode-gff');
@@ -46,44 +46,39 @@ let import_gff = async function(filename, cmd) {
 
 let import_env = async function(filename, cmd) {
     let db = await jdb.Database(cmd.database);
-
-    fs.readFile(filename, function(err, data) {
+    let data = await fs.readFile(filename);
+    csv.parse(data, function(err, data) {
         if (err !== null) {
             throw err;
         }
-        csv.parse(data, function(err, data) {
+
+        let sampleid_index = data[0].findIndex(function(value) {
+            return value.trim().toLowerCase() == 'sampleid';
+        });
+
+        if (sampleid_index === -1) {
+            throw new Error('Environmental data does not include SampleIDs');
+        }
+
+        let samples = [];
+        for (let i = 1; i < data.length; ++i) {
+            let sid = data[i][sampleid_index];
+            if (sid in samples) {
+                throw new Error(`duplicate SampleID ${sid}`);
+            }
+            samples[sid] = {};
+            for (let j = 0; j < data[i].length; ++j) {
+                if (j != sampleid_index) {
+                    samples[sid][data[0][j]] = data[i][j];
+                }
+            }
+        }
+
+        db.insert_environment(samples).catch(function(err) {
             if (err !== null) {
-                throw err;
+                process.stderr.write(err + '\n');
+                process.exit(1);
             }
-
-            let sampleid_index = data[0].findIndex(function(value) {
-                return value.trim().toLowerCase() == 'sampleid';
-            });
-
-            if (sampleid_index === -1) {
-                throw new Error('Environmental data does not include SampleIDs');
-            }
-
-            let samples = [];
-            for (let i = 1; i < data.length; ++i) {
-                let sid = data[i][sampleid_index];
-                if (sid in samples) {
-                    throw new Error(`duplicate SampleID ${sid}`);
-                }
-                samples[sid] = {};
-                for (let j = 0; j < data[i].length; ++j) {
-                    if (j != sampleid_index) {
-                        samples[sid][data[0][j]] = data[i][j];
-                    }
-                }
-            }
-
-            db.insert_environment(samples).catch(function(err) {
-                if (err !== null) {
-                    process.stderr.write(err + '\n');
-                    process.exit(1);
-                }
-            });
         });
     });
 };
