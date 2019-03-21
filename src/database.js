@@ -80,6 +80,11 @@ module.exports.Database = async function(filename = 'gemma.db', callback) {
         }
     };
 
+    let list = async function(table, column, { distinct = false } = {}) {
+        let query = `SELECT ${distinct ? 'DISTINCT' : ''} ${column} FROM ${table}`;
+        return db.all(query).then(data => data.map(entry => entry[column]));
+    };
+
     let query = async function(sid, chr, pos) {
         let query = 'SELECT ChromosomeCopy, Alternate, Name, Value FROM variants NATURAL JOIN alternates NATURAL JOIN environment where SampleID=? AND Chromosome=? AND Position=?';
 
@@ -108,6 +113,6 @@ module.exports.Database = async function(filename = 'gemma.db', callback) {
             return db;
         },
 
-        close, insert_entry, insert_environment, insert_gene_feature, query
+        close, insert_entry, insert_environment, insert_gene_feature, list, query
     });
 };

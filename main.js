@@ -25,10 +25,16 @@ program
     .action(gemma.import.gff);
 
 program
+    .command('list-samples')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
+    .description('List the distinct sample IDs')
+    .action(gemma.query.listSamples);
+
+program
     .command('query <sampleid> <chromosome> <position>')
     .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Query the database for entries')
-    .action(gemma.query);
+    .action(gemma.query.query);
 
 program.on('command:*', function() {
     process.stdout.write(program.helpInformation() + '\n');
