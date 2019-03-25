@@ -2,10 +2,13 @@
   "name": "@dglmoore/gemma",
   "version": "0.0.0",
   "description": "Mapping genomic data and such",
-  "main": "main.js",
+  "main": "lib/index.js",
+  "bin": {
+    "gemma": "main.js"
+  },
   "scripts": {
     "test": "jest",
-    "lint": "eslint main.js src test"
+    "lint": "eslint main.js lib test"
   },
   "repository": {
     "type": "git",
