@@ -1,8 +1,5 @@
 const program = require('commander');
-const gemma = {
-    import: require('./src/import'),
-    query: require('./src/query')
-};
+const gemma = require('./src/index');
 
 program.version('0.0.0', '-v, --version');
 
