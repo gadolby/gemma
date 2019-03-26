@@ -69,7 +69,9 @@ test('can import gff', async function() {
         return (start) ? start : end;
     };
 
-    await gff(gffFile, { database: dbFile });
+    const n = await gff(gffFile, { database: dbFile });
+    expect(n).toBe(3);
+
     const db = await Database(dbFile);
     const genes = await db.handle.all('SELECT * FROM genes');
     expect(genes.sort(geneSorter)).toEqual([
