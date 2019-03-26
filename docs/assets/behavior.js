@@ -13,7 +13,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "commentsOnly": true,
           "name": "Markdown"
         },
-        "sourcePath": "/home/ec2-user/gemma/README.md",
+        "sourcePath": "/home/dglmoore/gemma/README.md",
         "projectPath": "README.md",
         "targetPath": "index",
         "pageTitle": "Gemma",
@@ -43,71 +43,11 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "foldPrefix": "^",
           "name": "JavaScript"
         },
-        "sourcePath": "/home/ec2-user/gemma/src/database.js",
-        "projectPath": "src/database.js",
-        "targetPath": "database",
-        "pageTitle": "database",
-        "title": "database"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/ec2-user/gemma/src/import.js",
-        "projectPath": "src/import.js",
-        "targetPath": "import",
-        "pageTitle": "import",
-        "title": "import"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/ec2-user/gemma/main.js",
+        "sourcePath": "/home/dglmoore/gemma/main.js",
         "projectPath": "main.js",
         "targetPath": "main",
         "pageTitle": "main",
         "title": "main"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/ec2-user/gemma/src/query.js",
-        "projectPath": "src/query.js",
-        "targetPath": "query",
-        "pageTitle": "query",
-        "title": "query"
       },
       "depth": 1,
       "outline": []
