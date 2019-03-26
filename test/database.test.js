@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { Database } = require('../lib/database');
 
-const dbFile = path.join('test','assets','gemma.db');
+const dbFile = path.join('test','assets','gemma-database.db');
 
 beforeEach(function() {
     fs.ensureDirSync(path.dirname(dbFile));
@@ -122,22 +122,22 @@ test('can add environmental variables', async function() {
     const env = {
         'sample1': {
             'temperature': 290,
-            'altitude': 1000,
+            'elevation': 1000,
             'name': 'Susan'
         },
         'sample2': {
             'temperature': 300,
-            'altitude': 900,
+            'elevation': 900,
             'name': 'Jim'
         },
         'sample3': {
             'temperature': 305,
-            'altitude': 800,
+            'elevation': 800,
             'name': 'Alice'
         },
         'sample4': {
             'temperature': 305,
-            'altitude': 800,
+            'elevation': 800,
             'name': 'Bob'
         },
         'sample5': {
@@ -149,16 +149,16 @@ test('can add environmental variables', async function() {
     await db.insert_environment(env);
     const rows = await db.handle.all('SELECT * FROM environment');
     expect(rows.sort(sorter)).toEqual([
-        { 'SampleID': 'sample1', 'Name': 'altitude',    'Value': 1000 },
+        { 'SampleID': 'sample1', 'Name': 'elevation',    'Value': 1000 },
         { 'SampleID': 'sample1', 'Name': 'name',        'Value': 'Susan' },
         { 'SampleID': 'sample1', 'Name': 'temperature', 'Value': 290 },
-        { 'SampleID': 'sample2', 'Name': 'altitude',    'Value': 900 },
+        { 'SampleID': 'sample2', 'Name': 'elevation',    'Value': 900 },
         { 'SampleID': 'sample2', 'Name': 'name',        'Value': 'Jim' },
         { 'SampleID': 'sample2', 'Name': 'temperature', 'Value': 300 },
-        { 'SampleID': 'sample3', 'Name': 'altitude',    'Value': 800 },
+        { 'SampleID': 'sample3', 'Name': 'elevation',    'Value': 800 },
         { 'SampleID': 'sample3', 'Name': 'name',        'Value': 'Alice' },
         { 'SampleID': 'sample3', 'Name': 'temperature', 'Value': 305 },
-        { 'SampleID': 'sample4', 'Name': 'altitude',    'Value': 800 },
+        { 'SampleID': 'sample4', 'Name': 'elevation',    'Value': 800 },
         { 'SampleID': 'sample4', 'Name': 'name',        'Value': 'Bob' },
         { 'SampleID': 'sample4', 'Name': 'temperature', 'Value': 305 },
         { 'SampleID': 'sample5', 'Name': 'name',        'Value': 'Gemma' },
@@ -253,22 +253,22 @@ test('can query variants', async function() {
     const env = {
         'sample1': {
             'temperature': 290,
-            'altitude': 1000,
+            'elevation': 1000,
             'name': 'Susan'
         },
         'sample2': {
             'temperature': 300,
-            'altitude': 900,
+            'elevation': 900,
             'name': 'Jim'
         },
         'sample3': {
             'temperature': 305,
-            'altitude': 800,
+            'elevation': 800,
             'name': 'Alice'
         },
         'sample4': {
             'temperature': 305,
-            'altitude': 800,
+            'elevation': 800,
             'name': 'Bob'
         }
     };
@@ -284,7 +284,7 @@ test('can query variants', async function() {
         Alternates: ['A','C'],
         Environment: {
             temperature: 290,
-            altitude: 1000,
+            elevation: 1000,
             name: 'Susan'
         }
     });
@@ -297,7 +297,7 @@ test('can query variants', async function() {
         Alternates: ['CT', '.'],
         Environment: {
             temperature: 305,
-            altitude: 800,
+            elevation: 800,
             name: 'Alice'
         }
     });
@@ -310,7 +310,7 @@ test('can query variants', async function() {
         Alternates: ['GTG','GTG'],
         Environment: {
             temperature: 305,
-            altitude: 800,
+            elevation: 800,
             name: 'Bob'
         }
     });
