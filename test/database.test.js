@@ -1,7 +1,12 @@
 const fs = require('fs-extra');
+const path = require('path');
 const { Database } = require('../lib/database');
 
-const dbFile = 'test/assets/gemma.db';
+const dbFile = path.join('test','assets','gemma.db');
+
+beforeEach(function() {
+    fs.ensureDirSync(path.dirname(dbFile));
+});
 
 afterEach(function() {
     fs.unlinkSync(dbFile);
