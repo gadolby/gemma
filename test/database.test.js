@@ -13,13 +13,14 @@ afterEach(function() {
 });
 
 test('creates database file', async function() {
-    await Database(dbFile);
+    const db = await Database(dbFile);
     expect(fs.existsSync(dbFile)).toBeTruthy();
+    await db.close();
 });
 
 test('creates tables', async function() {
-    const tables = await Database(dbFile)
-        .then(db => db.handle.all('select name from sqlite_master where type="table"'))
+    const db = await Database(dbFile);
+    const tables = await db.handle.all('select name from sqlite_master where type="table"')
         .then(tables => tables.map(t => t.name).sort());
     expect(tables).toEqual([
         'alternates',
@@ -28,6 +29,7 @@ test('creates tables', async function() {
         'subgenes',
         'variants'
     ]);
+    await db.close();
 });
 
 test.each`
@@ -39,13 +41,12 @@ ${'genes'}       | ${[['GeneID','string'],['Source','string'],['Start','int'],['
 ${'subgenes'}    | ${[['GeneID','string'],['ID','string'],['Source','string'],['Type','string'],['Start','int'],['End','int'],['Note','string']]}
 `('creates correct columns for table $table', async function({ table, expectedColumns }) {
     const sorter = (a, b) => (a[0] < b[0]) ? -1 : (a[0] > b[0]) ? 1 : 0;
-    const columns = await Database(dbFile)
-        .then(db => db.handle.all(`PRAGMA table_info(${table})`))
+    const db = await Database(dbFile);
+    const columns = await db.handle.all(`PRAGMA table_info(${table})`)
         .then(columns => columns.map(c => [ c.name, c.type ]));
     expect(columns.sort(sorter)).toEqual(expectedColumns.sort(sorter));
+    await db.close();
 });
-
-test('can close', async () => await Database(dbFile).then(db => db.close()));
 
 test('can insert alternates', async function() {
     const entry = {
@@ -70,6 +71,7 @@ test('can insert alternates', async function() {
         { AlternateID: 3, Alternate: 'CT',  Chromosome: 'scaffold_1', Position: 10, SNP: 0 },
         { AlternateID: 4, Alternate: 'GTG', Chromosome: 'scaffold_1', Position: 10, SNP: 0 },
     ]);
+    await db.close();
 });
 
 test('can insert variants', async function() {
@@ -107,6 +109,8 @@ test('can insert variants', async function() {
         { SampleID: 'sample4', Chromosome: 'scaffold_1', Position: 10, ChromosomeCopy: 1, AlternateID: 4 },
         { SampleID: 'sample4', Chromosome: 'scaffold_1', Position: 10, ChromosomeCopy: 2, AlternateID: 4 },
     ]);
+
+    await db.close();
 });
 
 test('can add environmental variables', async function() {
@@ -160,6 +164,8 @@ test('can add environmental variables', async function() {
         { 'SampleID': 'sample5', 'Name': 'name',        'Value': 'Gemma' },
         { 'SampleID': 'sample5', 'Name': 'temperature', 'Value': null }
     ]);
+
+    await db.close();
 });
 
 test('can add gene features', async function() {
@@ -181,6 +187,8 @@ test('can add gene features', async function() {
         { GeneID: 'MyGene', Source: 'matcher', Start: 123, End: 256, Note: 'Similar to Doug' }
     ]);
     expect(await db.handle.all('SELECT * FROM subgenes')).toHaveLength(0);
+
+    await db.close();
 });
 
 test('can add subgene features', async function() {
@@ -201,6 +209,7 @@ test('can add subgene features', async function() {
         { GeneID: 'MyGene', ID: 'MyGene:exon', Source: 'matcher', Type: 'exon', Start: 123, End: 152, Note: null }
     ]);
     expect(await db.handle.all('SELECT * FROM genes')).toHaveLength(0);
+    await db.close();
 });
 
 test('can list from a table', async function() {
@@ -225,6 +234,7 @@ test('can list from a table', async function() {
 
     chromosomes = await db.list('alternates', 'Chromosome', { distinct: true });
     expect(chromosomes).toEqual(['scaffold_1']);
+    await db.close();
 });
 
 test('can query variants', async function() {
@@ -308,4 +318,6 @@ test('can query variants', async function() {
     expect(await db.query('sample5', 'scaffold_1', 10)).toEqual({});
     expect(await db.query('sample1', 'scaffold_2', 10)).toEqual({});
     expect(await db.query('sample1', 'scaffold_1', 100)).toEqual({});
+
+    await db.close();
 });
