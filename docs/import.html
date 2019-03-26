@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>import</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="import"><meta name="groc-project-path" content="src/import.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/src/import.js">src/import.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs-extra'</span>);
+<!DOCTYPE html><html lang="en"><head><title>import</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="import"><meta name="groc-project-path" content="lib/import.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/lib/import.js">lib/import.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs-extra'</span>);
 <span class="hljs-keyword">const</span> jdb = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./database'</span>);
 <span class="hljs-keyword">const</span> vcf = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-vcf'</span>);
 <span class="hljs-keyword">const</span> gff = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-gff'</span>);
@@ -53,7 +53,7 @@
         }
 
         <span class="hljs-keyword">let</span> sampleid_index = data[<span class="hljs-number">0</span>].findIndex(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
-            <span class="hljs-keyword">return</span> value.trim().toLowerCase() == <span class="hljs-string">'sampleid'</span>;
+            <span class="hljs-keyword">return</span> value.trim().toLowerCase() === <span class="hljs-string">'sampleid'</span>;
         });
 
         <span class="hljs-keyword">if</span> (sampleid_index === -<span class="hljs-number">1</span>) {

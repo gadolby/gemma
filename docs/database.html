@@ -1,16 +1,17 @@
-<!DOCTYPE html><html lang="en"><head><title>database</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="database"><meta name="groc-project-path" content="src/database.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/src/database.js">src/database.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> sqlite = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sqlite'</span>);
+<!DOCTYPE html><html lang="en"><head><title>database</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="database"><meta name="groc-project-path" content="lib/database.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/lib/database.js">lib/database.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> sqlite = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sqlite'</span>);
 
-<span class="hljs-keyword">const</span> snip_test = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...alts</span>) </span>{
-    <span class="hljs-keyword">return</span> alts.every(a =&gt; [<span class="hljs-string">'A'</span>,<span class="hljs-string">'T'</span>,<span class="hljs-string">'C'</span>,<span class="hljs-string">'G'</span>].find(b =&gt; a == b.toUpperCase()));
+<span class="hljs-keyword">const</span> is_snp = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt</span>) </span>{
+    <span class="hljs-keyword">const</span> a = alt.toUpperCase();
+    <span class="hljs-keyword">return</span> [<span class="hljs-string">'A'</span>,<span class="hljs-string">'T'</span>,<span class="hljs-string">'C'</span>,<span class="hljs-string">'G'</span>].find(b =&gt; a === b) !== <span class="hljs-literal">undefined</span>;
 };
 
-<span class="hljs-built_in">module</span>.exports.Database = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename = 'gemma.db', callback</span>) </span>{
+<span class="hljs-built_in">module</span>.exports.Database = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename</span>) </span>{
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> sqlite.open(filename, { verbose: <span class="hljs-literal">true</span> });
 
     <span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all([
         db.run(<span class="hljs-string">'pragma synchronous = OFF'</span>),
         db.run(<span class="hljs-string">'pragma journal_mode = MEMORY'</span>),
-        db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position Int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))'</span>),
+        db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))'</span>),
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))'</span>),
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))'</span>),
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS genes (GeneID string, Source string, Start int, End int, Note string, PRIMARY KEY (GeneID))'</span>),
@@ -21,12 +22,11 @@
 
     <span class="hljs-keyword">let</span> insert_alternates = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)'</span>,
-            alts = entry.alt.split(<span class="hljs-string">','</span>),
-            is_snp = snip_test(entry.ref, ...alts);
+            alts = entry.alt.split(<span class="hljs-string">','</span>);
 
-        <span class="hljs-keyword">let</span> promises = [db.run(query, <span class="hljs-number">0</span>, entry.chr, entry.pos, entry.ref, is_snp)];
+        <span class="hljs-keyword">let</span> promises = [db.run(query, <span class="hljs-number">0</span>, entry.chr, entry.pos, entry.ref, <span class="hljs-number">0</span>)];
         alts.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt, i</span>) </span>{
-            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chr, entry.pos, alt, is_snp));
+            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chr, entry.pos, alt, is_snp(alt)));
         });
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
     };
@@ -63,7 +63,7 @@
     <span class="hljs-keyword">let</span> insert_gene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)'</span>;
         <span class="hljs-keyword">const</span> { ID, Note } = entry.attributes;
-        <span class="hljs-keyword">return</span> db.run(query, ID, entry.type, entry.start, entry.end, Note);
+        <span class="hljs-keyword">return</span> db.run(query, ID, entry.source, entry.start, entry.end, Note);
     };
 
     <span class="hljs-keyword">let</span> insert_subgene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
@@ -74,9 +74,9 @@
 
     <span class="hljs-keyword">let</span> insert_gene_feature = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">if</span> (entry.type.toLowerCase() === <span class="hljs-string">'gene'</span>) {
-            <span class="hljs-keyword">return</span> insert_gene(entry, callback);
+            <span class="hljs-keyword">return</span> insert_gene(entry);
         } <span class="hljs-keyword">else</span> {
-            <span class="hljs-keyword">return</span> insert_subgene(entry, callback);
+            <span class="hljs-keyword">return</span> insert_subgene(entry);
         }
     };
 
@@ -94,7 +94,7 @@
                     SampleId: sid,
                     Chromosome: chr,
                     Position: pos,
-                    Alternates: [],
+                    Alternates: [<span class="hljs-string">'.'</span>, <span class="hljs-string">'.'</span>],
                     Environment: {}
                 };
                 entries.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{

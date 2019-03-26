@@ -17,17 +17,67 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "README.md",
         "targetPath": "index",
         "pageTitle": "Gemma",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "Gemma",
-            "slug": "gemma",
-            "isFileHeader": true
-          },
-          "depth": 1
-        },
         "title": "Gemma"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/home/dglmoore/gemma/lib/index.js",
+        "projectPath": "lib/index.js",
+        "targetPath": "index",
+        "pageTitle": "index",
+        "title": "index"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/home/dglmoore/gemma/lib/database.js",
+        "projectPath": "lib/database.js",
+        "targetPath": "database",
+        "pageTitle": "database",
+        "title": "database"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/home/dglmoore/gemma/lib/import.js",
+        "projectPath": "lib/import.js",
+        "targetPath": "import",
+        "pageTitle": "import",
+        "title": "import"
       },
       "depth": 1,
       "outline": []
@@ -48,6 +98,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "targetPath": "main",
         "pageTitle": "main",
         "title": "main"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/home/dglmoore/gemma/lib/query.js",
+        "projectPath": "lib/query.js",
+        "targetPath": "query",
+        "pageTitle": "query",
+        "title": "query"
       },
       "depth": 1,
       "outline": []
