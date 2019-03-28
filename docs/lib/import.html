@@ -21,10 +21,10 @@
             }
         });
 
-        vcf.on(<span class="hljs-string">'error'</span>, (err) =&gt; db.close().then(() =&gt; reject(err)));
+        vcf.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
 
-        vcf.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(() =&gt; resolve(n)));
-    });
+        vcf.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
+    }).finally(() =&gt; db.close());
 };
 
 <span class="hljs-keyword">let</span> import_gff = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
@@ -43,10 +43,10 @@
             }
         });
 
-        g.on(<span class="hljs-string">'error'</span>, (err) =&gt; db.close().then(() =&gt; reject(err)));
+        g.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
 
-        g.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(() =&gt; resolve(n)));
-    });
+        g.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
+    }).finally(() =&gt; db.close());
 };
 
 <span class="hljs-keyword">const</span> parseEnv = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
