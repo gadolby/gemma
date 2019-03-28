@@ -8,8 +8,6 @@
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
-        process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>... `</span>);
-
         <span class="hljs-keyword">const</span> vcf = VCF();
         vcf.read(filename);
 
@@ -24,7 +22,6 @@
         });
 
         vcf.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            process.stdout.write(<span class="hljs-string">`done. (<span class="hljs-subst">${n}</span> entries)\n`</span>);
             resolve(n);
         }));
     });
@@ -34,7 +31,6 @@
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
-        process.stdout.write(<span class="hljs-string">`Importing features from GFF file <span class="hljs-subst">${filename}</span>...`</span>);
         <span class="hljs-keyword">const</span> g = gff.read(filename);
 
         <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
@@ -48,7 +44,6 @@
         });
 
         g.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            process.stdout.write(<span class="hljs-string">`done. (<span class="hljs-subst">${n}</span> features)\n`</span>);
             resolve(n);
         }));
     });
