@@ -22,10 +22,11 @@ afterEach(function() {
 
 test('can import vcf', async function() {
     const variantSorter = function(a, b) {
+        const s = fieldSorter(a, b, 'SampleID');
         const c = fieldSorter(a, b, 'Chromosome');
         const p = fieldSorter(a, b, 'Position');
         const cc = fieldSorter(a, b, 'ChromosomeCopy');
-        return (c) ? c : (p) ? p : cc;
+        return (s) ? s : (c) ? c : (p) ? p : cc;
     };
 
     const alternateSorter = function(a, b) {
@@ -46,17 +47,26 @@ test('can import vcf', async function() {
         { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
         { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 1 },
         { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 1 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 }
+        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 1, AlternateID: 2 },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 2, AlternateID: null },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 2 },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 2 },
+        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 }
     ]);
 
     const alternates = await db.handle.all('SELECT * FROM alternates');
     expect(alternates.sort(alternateSorter)).toEqual([
         { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 0, Alternate: 'CAAA', SNP: 0 },
         { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 1, Alternate: 'CAA', SNP: 0 },
+        { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 2, Alternate: '*', SNP: 0 },
         { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 0, Alternate: 'G', SNP: 0 },
         { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 1, Alternate: 'C', SNP: 1 },
+        { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 2, Alternate: 'T', SNP: 1 },
         { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 0, Alternate: 'ATA', SNP: 0 },
         { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 1, Alternate: 'ATACTCGGTA', SNP: 0 },
+        { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 2, Alternate: 'AT', SNP: 0 },
     ]);
 
     await db.close();

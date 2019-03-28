@@ -121,6 +121,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       },
       "depth": 1,
       "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/home/dglmoore/gemma/lib/vcf.js",
+        "projectPath": "lib/vcf.js",
+        "targetPath": "vcf",
+        "pageTitle": "vcf",
+        "title": "vcf"
+      },
+      "depth": 1,
+      "outline": []
     }
   ];
 

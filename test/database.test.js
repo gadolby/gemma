@@ -51,15 +51,15 @@ ${'subgenes'}    | ${[['GeneID','string'],['ID','string'],['Source','string'],['
 test('can insert alternates', async function() {
     const entry = {
         sampleinfo: [
-            { NAME: 'sample1', GT: '0/1' },
-            { NAME: 'sample2', GT: '1/2' },
-            { NAME: 'sample3', GT: '3/.' },
-            { NAME: 'sample4', GT: '4/4' }
+            { name: 'sample1', GT: ['0','1'] },
+            { name: 'sample2', GT: ['1','2'] },
+            { name: 'sample3', GT: ['3','.'] },
+            { name: 'sample4', GT: ['4','4'] }
         ],
-        chr: 'scaffold_1',
+        chrom: 'scaffold_1',
         pos: 10,
         ref: 'A',
-        alt: 'C,T,CT,GTG'
+        alt: ['C','T','CT','GTG']
     };
     const db = await Database(dbFile);
     await db.insert_entry(entry);
@@ -86,15 +86,15 @@ test('can insert variants', async function() {
     };
     const entry = {
         sampleinfo: [
-            { NAME: 'sample1', GT: '0/1' },
-            { NAME: 'sample2', GT: '1/2' },
-            { NAME: 'sample3', GT: '3/.' },
-            { NAME: 'sample4', GT: '4/4' }
+            { name: 'sample1', GT: ['0','1'] },
+            { name: 'sample2', GT: ['1','2'] },
+            { name: 'sample3', GT: ['3','.'] },
+            { name: 'sample4', GT: ['4','4'] }
         ],
-        chr: 'scaffold_1',
+        chrom: 'scaffold_1',
         pos: 10,
         ref: 'A',
-        alt: 'C,T,CT,GTG'
+        alt: ['C','T','CT','GTG']
     };
     const db = await Database(dbFile);
     await db.insert_entry(entry);
@@ -215,15 +215,15 @@ test('can add subgene features', async function() {
 test('can list from a table', async function() {
     const entry = {
         sampleinfo: [
-            { NAME: 'sample1', GT: '0/1' },
-            { NAME: 'sample2', GT: '1/2' },
-            { NAME: 'sample3', GT: '3/.' },
-            { NAME: 'sample4', GT: '4/4' }
+            { name: 'sample1', GT: ['0','1'] },
+            { name: 'sample2', GT: ['1','2'] },
+            { name: 'sample3', GT: ['3','.'] },
+            { name: 'sample4', GT: ['4','4'] }
         ],
-        chr: 'scaffold_1',
+        chrom: 'scaffold_1',
         pos: 10,
         ref: 'A',
-        alt: 'C,T,CT,GTG'
+        alt: ['C','T','CT','GTG']
     };
     const db = await Database(dbFile);
     await db.insert_entry(entry);
@@ -240,15 +240,15 @@ test('can list from a table', async function() {
 test('can query variants', async function() {
     const entry = {
         sampleinfo: [
-            { NAME: 'sample1', GT: '0/1' },
-            { NAME: 'sample2', GT: '1/2' },
-            { NAME: 'sample3', GT: '3/.' },
-            { NAME: 'sample4', GT: '4/4' }
+            { name: 'sample1', GT: ['0','1'] },
+            { name: 'sample2', GT: ['1','2'] },
+            { name: 'sample3', GT: ['3','.'] },
+            { name: 'sample4', GT: ['4','4'] }
         ],
-        chr: 'scaffold_1',
+        chrom: 'scaffold_1',
         pos: 10,
         ref: 'A',
-        alt: 'C,T,CT,GTG'
+        alt: ['C','T','CT','GTG']
     };
     const env = {
         'sample1': {

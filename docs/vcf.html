@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="en"><head><title>vcf</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="vcf"><meta name="groc-project-path" content="lib/vcf.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/lib/vcf.js">lib/vcf.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs-extra'</span>);
+<span class="hljs-keyword">const</span> readline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'readline'</span>);
+<span class="hljs-keyword">const</span> events = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>);
+
+<span class="hljs-keyword">const</span> Parser = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filepath</span>) </span>{
+    <span class="hljs-keyword">const</span> bases = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>(<span class="hljs-string">'ATCGatcg'</span>);
+    <span class="hljs-keyword">const</span> mandatoryColumns = [<span class="hljs-string">'CHROM'</span>, <span class="hljs-string">'POS'</span>, <span class="hljs-string">'ID'</span>, <span class="hljs-string">'REF'</span>, <span class="hljs-string">'ALT'</span>, <span class="hljs-string">'QUAL'</span>, <span class="hljs-string">'FILTER'</span>, <span class="hljs-string">'INFO'</span>];
+
+    <span class="hljs-keyword">let</span> lineNumber = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">let</span> fileFormat = <span class="hljs-string">''</span>;
+    <span class="hljs-keyword">let</span> headerSeenOn = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">let</span> allColumns = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">let</span> fixedColumns = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">let</span> formatColumn = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">let</span> sampleIDs = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">let</span> columnIndices = {};
+
+    <span class="hljs-keyword">let</span> ploidy = <span class="hljs-literal">undefined</span>;
+
+    <span class="hljs-keyword">let</span> errorState = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.create({
+        get format() {
+            <span class="hljs-keyword">return</span> fileFormat;
+        },
+
+        line(line) {
+            lineNumber += <span class="hljs-number">1</span>;
+            line = line.trim();
+            <span class="hljs-keyword">if</span> (line.length !== <span class="hljs-number">0</span> &amp;&amp; !errorState) {
+                <span class="hljs-keyword">if</span> (lineNumber === <span class="hljs-number">1</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.fileFormat(line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (line.substr(<span class="hljs-number">0</span>,<span class="hljs-number">2</span>) === <span class="hljs-string">'##'</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.metadata(line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (line[<span class="hljs-number">0</span>] === <span class="hljs-string">'#'</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.header(line);
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data(line);
+                }
+            }
+        },
+
+        fileFormat(line) {
+            <span class="hljs-keyword">if</span> (line.substr(<span class="hljs-number">2</span>,<span class="hljs-number">10</span>) === <span class="hljs-string">'fileformat'</span>) {
+                fileFormat = line.substr(<span class="hljs-number">13</span>);
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">'invalid file format line'</span>, line);
+            }
+        },
+
+        metadata() { },
+
+        header(line) {
+            <span class="hljs-keyword">if</span> (headerSeenOn) {
+                <span class="hljs-keyword">const</span> msg =<span class="hljs-string">'multiple headers seen on lines '</span> + headerSeenOn + <span class="hljs-string">' and '</span> + lineNumber;
+                <span class="hljs-keyword">this</span>.fatal(msg, line);
+            } <span class="hljs-keyword">else</span> {
+                headerSeenOn = lineNumber;
+                allColumns = line.substr(<span class="hljs-number">1</span>).split(<span class="hljs-string">'\t'</span>);
+                <span class="hljs-keyword">if</span> (allColumns.length &lt; mandatoryColumns.length) {
+                    <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">'missing at least one manditory header column'</span>, line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (allColumns.length === mandatoryColumns.length) {
+                    fixedColumns = allColumns.slice();
+                } <span class="hljs-keyword">else</span> {
+                    fixedColumns = allColumns.slice(<span class="hljs-number">0</span>, mandatoryColumns.length);
+                    formatColumn = allColumns[mandatoryColumns.length];
+                    sampleIDs = allColumns.slice(mandatoryColumns.length + <span class="hljs-number">1</span>);
+                }
+
+                <span class="hljs-keyword">const</span> fixed = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>(fixedColumns);
+                <span class="hljs-keyword">if</span> (fixed.size !== fixedColumns.length) {
+                    <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">'at least one manditory header column is duplicated'</span>, line);
+                }
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> column <span class="hljs-keyword">of</span> mandatoryColumns) {
+                    <span class="hljs-keyword">if</span> (!fixed.has(column)) {
+                        <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">`the manditory column <span class="hljs-subst">${column}</span> is missing`</span>, line);
+                    }
+                }
+
+                <span class="hljs-keyword">if</span> (formatColumn !== <span class="hljs-literal">undefined</span> &amp;&amp; formatColumn !== <span class="hljs-string">'FORMAT'</span>) {
+                    <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`expected ninth column to be 'FORMAT', got <span class="hljs-subst">${formatColumn}</span>`</span>;
+                    <span class="hljs-keyword">this</span>.fatal(msg, line);
+                }
+
+                <span class="hljs-keyword">if</span> (sampleIDs !== <span class="hljs-literal">undefined</span> &amp;&amp; sampleIDs.length !== (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>(sampleIDs)).size) {
+                    <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">'at least one sampleID is duplicated'</span>, line);
+                }
+
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, len = allColumns.length; i &lt; len; ++i) {
+                    columnIndices[allColumns[i]] = i;
+                }
+            }
+        },
+
+        data(line) {
+            <span class="hljs-keyword">const</span> columns = line.split(<span class="hljs-string">'\t'</span>);
+            <span class="hljs-keyword">if</span> (columns.length !== allColumns.length) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`expected <span class="hljs-subst">${allColumns.length}</span> columns, got <span class="hljs-subst">${columns.length}</span>`</span>, line);
+            }
+
+            <span class="hljs-keyword">let</span> data = { };
+
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, len = fixedColumns.length; i &lt; len; ++i) {
+                data[fixedColumns[i].toLowerCase()] = columns[i];
+            }
+
+            data.alt = columns[columnIndices[<span class="hljs-string">'ALT'</span>]].split(<span class="hljs-string">','</span>);
+
+            data.info = {};
+            <span class="hljs-keyword">const</span> infoFields = columns[columnIndices[<span class="hljs-string">'INFO'</span>]].split(<span class="hljs-string">';'</span>);
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, len = infoFields.length; i &lt; len; ++i) {
+                <span class="hljs-keyword">const</span> [key, val, ...other] = infoFields[i].split(<span class="hljs-string">'='</span>);
+                <span class="hljs-keyword">if</span> (other.length !== <span class="hljs-number">0</span>) {
+                    <span class="hljs-keyword">this</span>.error(<span class="hljs-string">'illformed info field, possibly missing a semicolon'</span>, line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (val) {
+                    data.info[key] = val;
+                } <span class="hljs-keyword">else</span> {
+                    data.info.flags = (data.info.flags || []).concat(key);
+                }
+            }
+
+            data.sampleinfo = [];
+            <span class="hljs-keyword">if</span> (sampleIDs) {
+                <span class="hljs-keyword">const</span> formatTags = columns[columnIndices[formatColumn]].split(<span class="hljs-string">':'</span>);
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, len = sampleIDs.length; i &lt; len; ++i) {
+                    <span class="hljs-keyword">const</span> name = sampleIDs[i];
+                    <span class="hljs-keyword">let</span> sample = { name };
+                    <span class="hljs-keyword">let</span> parts = columns[columnIndices[name]].split(<span class="hljs-string">':'</span>);
+                    <span class="hljs-keyword">if</span> (parts.length !== formatTags.length) {
+                        <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`parts for sample "<span class="hljs-subst">${name}</span>" inconsistent with expected format`</span>;
+                        <span class="hljs-keyword">this</span>.error(msg, line);
+                    }
+                    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> j = <span class="hljs-number">0</span>, len = parts.length; j &lt; len; ++j) {
+                        sample[formatTags[j]] = parts[j];
+                    }
+                    <span class="hljs-keyword">if</span> (sample.GT !== <span class="hljs-literal">undefined</span>) {
+                        sample.GT = sample.GT.split(<span class="hljs-string">'/'</span>).map(x =&gt; (x === <span class="hljs-string">'.'</span>) ? x : <span class="hljs-built_in">parseInt</span>(x));
+                        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> gt <span class="hljs-keyword">of</span> sample.GT) {
+                            <span class="hljs-keyword">if</span> (gt !== <span class="hljs-string">'.'</span> &amp;&amp; (<span class="hljs-built_in">isNaN</span>(gt) || gt &lt; <span class="hljs-number">0</span> || gt &gt; data.alt.length)) {
+                                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`sample <span class="hljs-subst">${name}</span> has a genotype out of range`</span>, line);
+                            }
+                        }
+                        <span class="hljs-keyword">if</span> (ploidy === <span class="hljs-literal">undefined</span>) {
+                            ploidy = sample.GT.length;
+                        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sample.GT.length !== ploidy) {
+                            <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`sample <span class="hljs-subst">${name}</span> has unexpected ploidy <span class="hljs-subst">${sample.GT.length}</span>`</span>
+                                + <span class="hljs-string">` expected <span class="hljs-subst">${ploidy}</span> based on preceeding samples`</span>;
+                            <span class="hljs-keyword">this</span>.error(msg, line);
+                        }
+                    }
+                    data.sampleinfo.push(sample);
+                }
+            }
+
+            <span class="hljs-keyword">if</span> (data.ref.split(<span class="hljs-string">''</span>).some(x =&gt; !bases.has(x))) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`reference (<span class="hljs-subst">${data.ref}</span>) has an invalid base`</span>, line);
+            }
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, len = data.alt.length; i &lt; len; ++i) {
+                <span class="hljs-keyword">const</span> alt = data.alt[i];
+                <span class="hljs-keyword">const</span> bs = alt.split(<span class="hljs-string">''</span>);
+                <span class="hljs-keyword">if</span> (alt !== <span class="hljs-string">'*'</span> &amp;&amp; (bs.length === <span class="hljs-number">0</span> || bs.some(x =&gt; !bases.has(x)))) {
+                    <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`alternate <span class="hljs-subst">${i}</span> (<span class="hljs-subst">${alt}</span>) has an invalid base`</span>, line);
+                }
+            }
+
+            <span class="hljs-keyword">return</span> data;
+        },
+
+        fatal(msg, line) {
+            errorState = <span class="hljs-literal">true</span>;
+            <span class="hljs-keyword">this</span>.error(msg, line);
+        },
+
+        error(msg, line) {
+            msg = msg + <span class="hljs-string">'\n\t"'</span> + line + <span class="hljs-string">'"'</span>;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(filepath + <span class="hljs-string">':'</span> + lineNumber + <span class="hljs-string">' - '</span> + msg);
+        }
+    });
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">const</span> vcf = <span class="hljs-keyword">new</span> events.EventEmitter();
+
+    vcf.readStream = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">instream, filepath='&lt;stream&gt;'</span>) </span>{
+        <span class="hljs-keyword">this</span>.parser = Parser(filepath);
+        <span class="hljs-keyword">const</span> rl = readline.createInterface(instream);
+
+        rl.on(<span class="hljs-string">'line'</span>, (line) =&gt; {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">this</span>.parser.line(line);
+                <span class="hljs-keyword">if</span> (data) {
+                    vcf.emit(<span class="hljs-string">'data'</span>, data);
+                }
+            } <span class="hljs-keyword">catch</span> (err) {
+                vcf.emit(<span class="hljs-string">'error'</span>, err);
+            }
+        });
+
+        rl.on(<span class="hljs-string">'close'</span>, () =&gt; vcf.emit(<span class="hljs-string">'end'</span>));
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    };
+
+    vcf.read = (filepath) =&gt; vcf.readStream(fs.createReadStream(filepath), filepath);
+
+    <span class="hljs-keyword">return</span> vcf;
+};</div></div></div></div></body></html>

@@ -21,12 +21,11 @@
     <span class="hljs-keyword">let</span> close = () =&gt; db.close();
 
     <span class="hljs-keyword">let</span> insert_alternates = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
-        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)'</span>,
-            alts = entry.alt.split(<span class="hljs-string">','</span>);
+        <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)'</span>;
 
-        <span class="hljs-keyword">let</span> promises = [db.run(query, <span class="hljs-number">0</span>, entry.chr, entry.pos, entry.ref, <span class="hljs-number">0</span>)];
-        alts.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt, i</span>) </span>{
-            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chr, entry.pos, alt, is_snp(alt)));
+        <span class="hljs-keyword">let</span> promises = [db.run(query, <span class="hljs-number">0</span>, entry.chrom, entry.pos, entry.ref, <span class="hljs-number">0</span>)];
+        entry.alt.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt, i</span>) </span>{
+            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chrom, entry.pos, alt, is_snp(alt)));
         });
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
     };
@@ -35,9 +34,9 @@
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO variants (SampleID, Chromosome, Position, ChromosomeCopy, AlternateID) VALUES (?,?,?,?,?)'</span>;
         <span class="hljs-keyword">let</span> promises = [];
         entry.sampleinfo.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">variant</span>) </span>{
-            variant.GT.split(<span class="hljs-string">'/'</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v, j</span>) </span>{
-                <span class="hljs-keyword">let</span> alt = (v == <span class="hljs-string">'.'</span>) ? <span class="hljs-literal">null</span> : <span class="hljs-built_in">parseInt</span>(v);
-                promises.push(db.run(query, variant.NAME, entry.chr, entry.pos, j + <span class="hljs-number">1</span>, alt));
+            variant.GT.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v, j</span>) </span>{
+                <span class="hljs-keyword">let</span> alt = (v === <span class="hljs-string">'.'</span>) ? <span class="hljs-literal">null</span> : v;
+                promises.push(db.run(query, variant.name, entry.chrom, entry.pos, j + <span class="hljs-number">1</span>, alt));
             });
         });
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
