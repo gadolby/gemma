@@ -17,70 +17,130 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "README.md",
         "targetPath": "index",
         "pageTitle": "Gemma",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "Gemma",
+            "slug": "gemma",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
         "title": "Gemma"
       },
       "depth": 1,
       "outline": []
     }, {
-      "type": "file",
+      "type": "folder",
       "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/lib/index.js",
-        "projectPath": "lib/index.js",
-        "targetPath": "index",
-        "pageTitle": "index",
-        "title": "index"
+        "path": "lib",
+        "title": "lib"
       },
       "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/lib/database.js",
-        "projectPath": "lib/database.js",
-        "targetPath": "database",
-        "pageTitle": "database",
-        "title": "database"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/lib/import.js",
-        "projectPath": "lib/import.js",
-        "targetPath": "import",
-        "pageTitle": "import",
-        "title": "import"
-      },
-      "depth": 1,
-      "outline": []
+      "children": [
+        {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/lib/database.js",
+            "projectPath": "lib/database.js",
+            "targetPath": "lib/database",
+            "pageTitle": "lib/database",
+            "title": "database"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/lib/import.js",
+            "projectPath": "lib/import.js",
+            "targetPath": "lib/import",
+            "pageTitle": "lib/import",
+            "title": "import"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/lib/index.js",
+            "projectPath": "lib/index.js",
+            "targetPath": "lib/index",
+            "pageTitle": "lib/index",
+            "title": "index"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/lib/query.js",
+            "projectPath": "lib/query.js",
+            "targetPath": "lib/query",
+            "pageTitle": "lib/query",
+            "title": "query"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/lib/vcf.js",
+            "projectPath": "lib/vcf.js",
+            "targetPath": "lib/vcf",
+            "pageTitle": "lib/vcf",
+            "title": "vcf"
+          },
+          "depth": 2,
+          "outline": []
+        }
+      ]
     }, {
       "type": "file",
       "data": {
@@ -98,46 +158,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "targetPath": "main",
         "pageTitle": "main",
         "title": "main"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/lib/query.js",
-        "projectPath": "lib/query.js",
-        "targetPath": "query",
-        "pageTitle": "query",
-        "title": "query"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/lib/vcf.js",
-        "projectPath": "lib/vcf.js",
-        "targetPath": "vcf",
-        "pageTitle": "vcf",
-        "title": "vcf"
       },
       "depth": 1,
       "outline": []

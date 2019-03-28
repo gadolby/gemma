@@ -2,6 +2,7 @@
   "glob": ["README.md", "main.js", "lib/*.js"],
   "out": "docs",
   "github": false,
+  "strip": [],
   "empty-lines": false,
   "index-page-title": "Gemma",
   "only-render-newer": false,
