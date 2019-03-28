@@ -14,16 +14,16 @@
         <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
         vcf.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
             n += <span class="hljs-number">1</span>;
-            <span class="hljs-keyword">await</span> db.insert_entry(entry).catch(err =&gt; vcf.emit(<span class="hljs-string">'error'</span>, err));
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">await</span> db.insert_entry(entry);
+            } <span class="hljs-keyword">catch</span>(err) {
+                vcf.emit(<span class="hljs-string">'error'</span>, err);
+            }
         });
 
-        vcf.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-            reject(err);
-        });
+        vcf.on(<span class="hljs-string">'error'</span>, (err) =&gt; db.close().then(() =&gt; reject(err)));
 
-        vcf.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            resolve(n);
-        }));
+        vcf.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(() =&gt; resolve(n)));
     });
 };
 
@@ -36,16 +36,16 @@
         <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
         g.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
             n += <span class="hljs-number">1</span>;
-            <span class="hljs-keyword">await</span> db.insert_gene_feature(entry).catch(err =&gt; g.emit(<span class="hljs-string">'error'</span>, err));
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">await</span> db.insert_gene_feature(entry);
+            } <span class="hljs-keyword">catch</span>(err) {
+                g.emit(<span class="hljs-string">'error'</span>, g);
+            }
         });
 
-        g.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-            reject(err);
-        });
+        g.on(<span class="hljs-string">'error'</span>, (err) =&gt; db.close().then(() =&gt; reject(err)));
 
-        g.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            resolve(n);
-        }));
+        g.on(<span class="hljs-string">'end'</span>, () =&gt; db.close().then(() =&gt; resolve(n)));
     });
 };
 
