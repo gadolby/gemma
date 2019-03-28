@@ -111,6 +111,7 @@ test('can import environment', async function() {
         { SampleID: 'SAMPLE_A', Name: 'Name',           Value: 'Alice' },
         { SampleID: 'SAMPLE_A', Name: 'Temperature',    Value: 305 }
     ]);
+    await db.close();
 });
 
 test.each`
