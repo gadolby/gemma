@@ -5,7 +5,6 @@ const { Database } = require('../lib/database');
 
 const assetsPath = path.join(__dirname, 'assets');
 const dbFile  = path.join(assetsPath, 'gemma-import.db');
-const vcfFile = path.join(assetsPath, 'vcf', 'sample.vcf');
 const gffFile = path.join(assetsPath, 'gff', 'sample.gff');
 const ecoFile = path.join(assetsPath, 'env', 'valid.csv');
 
@@ -21,56 +20,109 @@ afterEach(function() {
     }
 });
 
-test('can import vcf', async function() {
-    const variantSorter = function(a, b) {
-        const s = fieldSorter(a, b, 'SampleID');
-        const c = fieldSorter(a, b, 'Chromosome');
-        const p = fieldSorter(a, b, 'Position');
-        const cc = fieldSorter(a, b, 'ChromosomeCopy');
-        return (s) ? s : (c) ? c : (p) ? p : cc;
-    };
+describe('import vcf', function() {
+    test.each([
+        'duplicate_column.vcf',
+        'duplicate_header.vcf',
+        'duplicate_sample.vcf',
+        'extra_sample_parts.vcf',
+        'illformed_info.vcf',
+        'invalid_alt_dot.vcf',
+        'invalid_alt_q.vcf',
+        'invalid_genotypes.vcf',
+        'invalid_ploidy.vcf',
+        'invalid_ref_star.vcf',
+        'missing_column.vcf',
+        'missing_sample_parts.vcf',
+        'no_alternates.vcf',
+        'no_fileformat.vcf',
+        'no_format.vcf',
+        'too_few_columns.vcf',
+        'too_few_samples_1.vcf',
+        'too_few_samples_2.vcf',
+        'too_many_samples.vcf'
+    ])('.fail at parse "%s"', async function(filename) {
+        const filepath = path.join(assetsPath, 'vcf', 'invalid', filename);
+        expect(fs.existsSync(filepath)).toBeTruthy();
 
-    const alternateSorter = function(a, b) {
-        const c = fieldSorter(a, b, 'Chromosome');
-        const p = fieldSorter(a, b, 'Position');
-        const ai = fieldSorter(a, b, 'AlternateID');
-        return (c) ? c : (p) ? p : ai;
-    };
+        return expect(vcf(filepath, { database: dbFile })).rejects.toThrow();
+    });
 
-    const n = await vcf(vcfFile, { database: dbFile });
-    expect(n).toBe(3);
+    test.each([
+        'no_genotypes.vcf',
+    ])('.fail at write "%s"', async function(filename) {
+        const filepath = path.join(assetsPath, 'vcf', 'valid', filename);
+        expect(fs.existsSync(filepath)).toBeTruthy();
 
-    const db = await Database(dbFile);
-    const variants = await db.handle.all('SELECT * FROM variants');
-    expect(variants.sort(variantSorter)).toEqual([
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 1, AlternateID: 1 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 2, AlternateID: 1 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 1 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 1 },
-        { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 1, AlternateID: 2 },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 2, AlternateID: null },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 2 },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 2 },
-        { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 }
-    ]);
+        return expect(vcf(filepath, { database: dbFile })).rejects.toThrow();
+    });
 
-    const alternates = await db.handle.all('SELECT * FROM alternates');
-    expect(alternates.sort(alternateSorter)).toEqual([
-        { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 0, Alternate: 'CAAA', SNP: 0 },
-        { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 1, Alternate: 'CAA', SNP: 0 },
-        { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 2, Alternate: '*', SNP: 0 },
-        { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 0, Alternate: 'G', SNP: 0 },
-        { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 1, Alternate: 'C', SNP: 1 },
-        { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 2, Alternate: 'T', SNP: 1 },
-        { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 0, Alternate: 'ATA', SNP: 0 },
-        { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 1, Alternate: 'ATACTCGGTA', SNP: 0 },
-        { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 2, Alternate: 'AT', SNP: 0 },
-    ]);
+    test.each([
+        'no_samples.vcf',
+        'only_mandatory.vcf',
+    ])('.succeed with no output "%s"', async function(filename) {
+        const filepath = path.join(assetsPath, 'vcf', 'valid', filename);
+        expect(fs.existsSync(filepath)).toBeTruthy();
 
-    return await db.close();
+        await expect(vcf(filepath, { database: dbFile })).resolves.toBe(3);
+        const db = await Database(dbFile);
+        await expect(db.handle.all('SELECT * FROM variants')).resolves.toEqual([]);
+    });
+
+    test.each([
+        'sample.vcf'
+    ])('.succeed on "%s"', async function(filename) {
+        const variantSorter = function(a, b) {
+            const s = fieldSorter(a, b, 'SampleID');
+            const c = fieldSorter(a, b, 'Chromosome');
+            const p = fieldSorter(a, b, 'Position');
+            const cc = fieldSorter(a, b, 'ChromosomeCopy');
+            return (s) ? s : (c) ? c : (p) ? p : cc;
+        };
+
+        const alternateSorter = function(a, b) {
+            const c = fieldSorter(a, b, 'Chromosome');
+            const p = fieldSorter(a, b, 'Position');
+            const ai = fieldSorter(a, b, 'AlternateID');
+            return (c) ? c : (p) ? p : ai;
+        };
+
+        const filepath = path.join(assetsPath, 'vcf', 'valid', filename);
+
+        await expect(vcf(filepath, { database: dbFile })).resolves.toBe(3);
+
+        const db = await Database(dbFile);
+        const variants = await db.handle.all('SELECT * FROM variants');
+        expect(variants.sort(variantSorter)).toEqual([
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 1, AlternateID: 1 },
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 2, AlternateID: 1 },
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 1 },
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 1 },
+            { SampleID: 'SAMPLE_A', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 1, AlternateID: 2 },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 672,  ChromosomeCopy: 2, AlternateID: null },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 1, AlternateID: 0 },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_1', Position: 5607, ChromosomeCopy: 2, AlternateID: 2 },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 1, AlternateID: 2 },
+            { SampleID: 'SAMPLE_B', Chromosome: 'scaffold_2', Position: 2911, ChromosomeCopy: 2, AlternateID: 1 }
+        ]);
+
+        const alternates = await db.handle.all('SELECT * FROM alternates');
+        expect(alternates.sort(alternateSorter)).toEqual([
+            { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 0, Alternate: 'CAAA', SNP: 0 },
+            { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 1, Alternate: 'CAA', SNP: 0 },
+            { Chromosome: 'scaffold_1', Position: 672,  AlternateID: 2, Alternate: '*', SNP: 0 },
+            { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 0, Alternate: 'G', SNP: 0 },
+            { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 1, Alternate: 'C', SNP: 1 },
+            { Chromosome: 'scaffold_1', Position: 5607, AlternateID: 2, Alternate: 'T', SNP: 1 },
+            { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 0, Alternate: 'ATA', SNP: 0 },
+            { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 1, Alternate: 'ATACTCGGTA', SNP: 0 },
+            { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 2, Alternate: 'AT', SNP: 0 },
+        ]);
+
+        return await db.close();
+    });
 });
 
 test('can import gff', async function() {
