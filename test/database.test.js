@@ -15,7 +15,8 @@ afterEach(function() {
 test('creates database file', async function() {
     const db = await Database(dbFile);
     expect(fs.existsSync(dbFile)).toBeTruthy();
-    await db.close();
+
+    return await db.close();
 });
 
 test('creates tables', async function() {
@@ -29,7 +30,8 @@ test('creates tables', async function() {
         'subgenes',
         'variants'
     ]);
-    await db.close();
+
+    return await db.close();
 });
 
 test.each`
@@ -45,7 +47,8 @@ ${'subgenes'}    | ${[['GeneID','string'],['ID','string'],['Source','string'],['
     const columns = await db.handle.all(`PRAGMA table_info(${table})`)
         .then(columns => columns.map(c => [ c.name, c.type ]));
     expect(columns.sort(sorter)).toEqual(expectedColumns.sort(sorter));
-    await db.close();
+
+    return await db.close();
 });
 
 test('can insert alternates', async function() {
@@ -71,7 +74,8 @@ test('can insert alternates', async function() {
         { AlternateID: 3, Alternate: 'CT',  Chromosome: 'scaffold_1', Position: 10, SNP: 0 },
         { AlternateID: 4, Alternate: 'GTG', Chromosome: 'scaffold_1', Position: 10, SNP: 0 },
     ]);
-    await db.close();
+
+    return await db.close();
 });
 
 test('can insert variants', async function() {
@@ -110,7 +114,7 @@ test('can insert variants', async function() {
         { SampleID: 'sample4', Chromosome: 'scaffold_1', Position: 10, ChromosomeCopy: 2, AlternateID: 4 },
     ]);
 
-    await db.close();
+    return await db.close();
 });
 
 test('can add environmental variables', async function() {
@@ -165,7 +169,7 @@ test('can add environmental variables', async function() {
         { 'SampleID': 'sample5', 'Name': 'temperature', 'Value': null }
     ]);
 
-    await db.close();
+    return await db.close();
 });
 
 test('can add gene features', async function() {
@@ -188,7 +192,7 @@ test('can add gene features', async function() {
     ]);
     expect(await db.handle.all('SELECT * FROM subgenes')).toHaveLength(0);
 
-    await db.close();
+    return await db.close();
 });
 
 test('can add subgene features', async function() {
@@ -209,7 +213,8 @@ test('can add subgene features', async function() {
         { GeneID: 'MyGene', ID: 'MyGene:exon', Source: 'matcher', Type: 'exon', Start: 123, End: 152, Note: null }
     ]);
     expect(await db.handle.all('SELECT * FROM genes')).toHaveLength(0);
-    await db.close();
+
+    return await db.close();
 });
 
 test('can list from a table', async function() {
@@ -234,7 +239,8 @@ test('can list from a table', async function() {
 
     chromosomes = await db.list('alternates', 'Chromosome', { distinct: true });
     expect(chromosomes).toEqual(['scaffold_1']);
-    await db.close();
+
+    return await db.close();
 });
 
 test('can query variants', async function() {
@@ -315,9 +321,9 @@ test('can query variants', async function() {
         }
     });
 
-    expect(await db.query('sample5', 'scaffold_1', 10)).toEqual({});
-    expect(await db.query('sample1', 'scaffold_2', 10)).toEqual({});
-    expect(await db.query('sample1', 'scaffold_1', 100)).toEqual({});
+    await expect(db.query('sample5', 'scaffold_1', 10)).rejects.toEqual({});
+    await expect(db.query('sample1', 'scaffold_2', 10)).rejects.toEqual({});
+    await expect(db.query('sample1', 'scaffold_1', 100)).rejects.toEqual({});
 
-    await db.close();
+    return await db.close();
 });
