@@ -3,10 +3,11 @@ const path = require('path');
 const { vcf, gff, env } = require('../lib/import');
 const { Database } = require('../lib/database');
 
-const dbFile = path.join('test','assets','gemma-import.db');
-const vcfFile = path.join('test', 'assets', 'vcf', 'sample.vcf');
-const gffFile = path.join('test', 'assets', 'gff', 'sample.gff');
-const ecoFile = path.join('test', 'assets', 'env', 'valid.csv');
+const assetsPath = path.join(__dirname, 'assets');
+const dbFile  = path.join(assetsPath, 'gemma-import.db');
+const vcfFile = path.join(assetsPath, 'vcf', 'sample.vcf');
+const gffFile = path.join(assetsPath, 'gff', 'sample.gff');
+const ecoFile = path.join(assetsPath, 'env', 'valid.csv');
 
 const fieldSorter = (a, b, f) => (a[f] < b[f]) ? -1 : (a[f] > b[f]) ? 1 : 0;
 
@@ -118,6 +119,6 @@ ${'syntax.csv'}     | ${/Number of columns is inconsistent/}
 ${'nosamples.csv'}  | ${/Environmental data does not include SampleIDs/}
 ${'dupsamples.csv'} | ${/duplicate SampleID/}
 `('throws for invalid environment file "$filename"', function({ filename, error }) {
-    const filepath = path.join('test', 'assets', 'env', filename);
+    const filepath = path.join(assetsPath, 'env', filename);
     expect(env(filepath, { database: dbFile })).rejects.toThrow(error);
 });
