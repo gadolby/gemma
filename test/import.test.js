@@ -67,6 +67,8 @@ describe('import vcf', function() {
         await expect(vcf(filepath, { database: dbFile })).resolves.toBe(3);
         const db = await Database(dbFile);
         await expect(db.handle.all('SELECT * FROM variants')).resolves.toEqual([]);
+
+        return db.close();
     });
 
     test.each([
