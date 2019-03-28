@@ -83,11 +83,15 @@
 };
 
 <span class="hljs-keyword">let</span> import_env = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
-    <span class="hljs-keyword">let</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
-    <span class="hljs-keyword">await</span> db.insert_environment(samples);
-    <span class="hljs-keyword">await</span> db.close();
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">const</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
+        <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
+        <span class="hljs-keyword">await</span> db.insert_environment(samples);
+    } <span class="hljs-keyword">finally</span> {
+        <span class="hljs-keyword">await</span> db.close();
+    }
+
 };
 
 <span class="hljs-built_in">module</span>.exports = {
