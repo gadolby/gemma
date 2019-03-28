@@ -38,13 +38,6 @@ program
     .description('List the distinct chromosomes')
     .action(gemma.query.listChromosomes);
 
-program
-    .command('query <sampleid> <chromosome> <position>')
-    .alias('q')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
-    .description('Query the database for entries')
-    .action(gemma.query.query);
-
 program.on('command:*', function() {
     process.stdout.write(program.helpInformation() + '\n');
     process.exit(1);
