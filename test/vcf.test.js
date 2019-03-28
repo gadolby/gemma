@@ -29,9 +29,10 @@ describe('throws for invalid vcf', function() {
 
         const mockError = jest.fn(x => x);
 
-        await new Promise(function(resolve) {
-            const vcf = require('../lib/vcf')();
-            expect(vcf.parser).toBeUndefined();
+        const vcf = require('../lib/vcf')();
+        expect(vcf.parser).toBeUndefined();
+
+        return await new Promise(function(resolve) {
             vcf.read(filepath)
                 .on('error', mockError)
                 .on('end', () => resolve());
@@ -46,10 +47,12 @@ describe('throws for invalid vcf', function() {
 
         const mockError = jest.fn(x => x);
 
-        await new Promise(function(resolve) {
-            const vcf = require('../lib/vcf')();
-            expect(vcf.parser).toBeUndefined();
-            vcf.read(filepath)
+        const vcf = require('../lib/vcf')();
+        expect(vcf.parser).toBeUndefined();
+
+        return await new Promise(function(resolve) {
+            const stream = fs.createReadStream(filepath);
+            vcf.readStream(stream)
                 .on('error', mockError)
                 .on('end', () => resolve());
         }).then(() => {
@@ -71,7 +74,8 @@ describe('parse without error', function() {
 
         const vcf = require('../lib/vcf')();
         expect(vcf.parser).toBeUndefined();
-        await new Promise(function(resolve) {
+
+        return await new Promise(function(resolve) {
             vcf.read(filepath)
                 .on('error', mockError)
                 .on('end', () => resolve());
@@ -93,9 +97,9 @@ describe('parse without error', function() {
 
         const vcf = require('../lib/vcf')();
         expect(vcf.parser).toBeUndefined();
-        await new Promise(function(resolve) {
-            const stream = fs.createReadStream(filepath);
 
+        return await new Promise(function(resolve) {
+            const stream = fs.createReadStream(filepath);
             vcf.readStream(stream)
                 .on('error', mockError)
                 .on('end', () => resolve());
