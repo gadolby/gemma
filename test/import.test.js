@@ -98,29 +98,31 @@ test('can import gff', async function() {
     return await db.close();
 });
 
-test('can import environment', async function() {
-    const envSorter = function (a, b) {
-        const s = fieldSorter(a, b, 'SampleID');
-        return s ? s : fieldSorter(a, b, 'Name');
-    };
-    await env(ecoFile, { database: dbFile });
-    const db = await Database(dbFile);
-    const environment = await db.handle.all('SELECT * FROM environment');
-    expect(environment.sort(envSorter)).toEqual([
-        { SampleID: 'SAMPLE_A', Name: 'Elevation',      Value: 1000 },
-        { SampleID: 'SAMPLE_A', Name: 'Name',           Value: 'Alice' },
-        { SampleID: 'SAMPLE_A', Name: 'Temperature',    Value: 305 }
-    ]);
+describe('enviroment', function() {
+    test('.can import', async function() {
+        const envSorter = function (a, b) {
+            const s = fieldSorter(a, b, 'SampleID');
+            return s ? s : fieldSorter(a, b, 'Name');
+        };
+        await env(ecoFile, { database: dbFile });
+        const db = await Database(dbFile);
+        const environment = await db.handle.all('SELECT * FROM environment');
+        expect(environment.sort(envSorter)).toEqual([
+            { SampleID: 'SAMPLE_A', Name: 'Elevation',      Value: 1000 },
+            { SampleID: 'SAMPLE_A', Name: 'Name',           Value: 'Alice' },
+            { SampleID: 'SAMPLE_A', Name: 'Temperature',    Value: 305 }
+        ]);
 
-    return await db.close();
-});
+        return await db.close();
+    });
 
-test.each`
-filename            | error
-${'syntax.csv'}     | ${/Number of columns is inconsistent/}
-${'nosamples.csv'}  | ${/Environmental data does not include SampleIDs/}
-${'dupsamples.csv'} | ${/duplicate SampleID/}
-`('throws for invalid environment file "$filename"', function({ filename, error }) {
+    test.each`
+        filename            | error
+        ${'syntax.csv'}     | ${/Number of columns is inconsistent/}
+        ${'nosamples.csv'}  | ${/Environmental data does not include SampleIDs/}
+        ${'dupsamples.csv'} | ${/duplicate SampleID/}
+    `('.throws for invalid environment file "$filename"', function({ filename, error }) {
     const filepath = path.join(assetsPath, 'env', filename);
     return expect(env(filepath, { database: dbFile })).rejects.toThrow(error);
+});
 });
