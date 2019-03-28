@@ -70,7 +70,7 @@ test('can import vcf', async function() {
         { Chromosome: 'scaffold_2', Position: 2911, AlternateID: 2, Alternate: 'AT', SNP: 0 },
     ]);
 
-    await db.close();
+    return await db.close();
 });
 
 test('can import gff', async function() {
@@ -95,7 +95,7 @@ test('can import gff', async function() {
         { GeneID: 'SPLAT-RA', ID: 'SPLAT-RA:exon:4045', Source: 'maker', Type: 'exon', Start: 2446, End: 2545, Note: null }
     ]);
 
-    await db.close();
+    return await db.close();
 });
 
 test('can import environment', async function() {
@@ -111,7 +111,8 @@ test('can import environment', async function() {
         { SampleID: 'SAMPLE_A', Name: 'Name',           Value: 'Alice' },
         { SampleID: 'SAMPLE_A', Name: 'Temperature',    Value: 305 }
     ]);
-    await db.close();
+
+    return await db.close();
 });
 
 test.each`
@@ -121,5 +122,5 @@ ${'nosamples.csv'}  | ${/Environmental data does not include SampleIDs/}
 ${'dupsamples.csv'} | ${/duplicate SampleID/}
 `('throws for invalid environment file "$filename"', function({ filename, error }) {
     const filepath = path.join(assetsPath, 'env', filename);
-    expect(env(filepath, { database: dbFile })).rejects.toThrow(error);
+    return expect(env(filepath, { database: dbFile })).rejects.toThrow(error);
 });
