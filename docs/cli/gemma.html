@@ -8,7 +8,7 @@
 
 <span class="hljs-keyword">const</span> table = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">heading, data</span>) </span>{
     <span class="hljs-keyword">const</span> hlen = heading.length;
-    <span class="hljs-keyword">const</span> dlen = <span class="hljs-built_in">Math</span>.max(...data.map(d =&gt; d.length));
+    <span class="hljs-keyword">const</span> dlen = <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">0</span>, ...data.map(d =&gt; d.length));
     <span class="hljs-keyword">const</span> width = <span class="hljs-built_in">Math</span>.max(hlen, dlen);
     <span class="hljs-keyword">const</span> hlPadWidth = <span class="hljs-built_in">Math</span>.floor((width - hlen) / <span class="hljs-number">2</span>);
 
@@ -22,58 +22,63 @@
     });
 };
 
-program.version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-string">'-v, --version'</span>);
+<span class="hljs-keyword">const</span> collectOpts = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cmd, ...keys</span>) </span>{
+    <span class="hljs-keyword">let</span> opts = {
+        database: cmd.parent.database
+    };
+    keys.forEach(k =&gt; opts[k] = cmd[k]);
+    <span class="hljs-keyword">return</span> opts;
+};
+
+program
+    .version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-string">'-v, --version'</span>)
+    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>);
 
 program
     .command(<span class="hljs-string">'import-vcf &lt;vcf-filename&gt;'</span>)
     .alias(<span class="hljs-string">'iv'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import a VCF file into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
         process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.vcf(filename, cmd)
+        gemma.import.vcf(filename, collectOpts(cmd))
             .then(n =&gt; process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
     });
 
 program
     .command(<span class="hljs-string">'import-env &lt;csv-filename&gt;'</span>)
     .alias(<span class="hljs-string">'ie'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import environmental data into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
         process.stdout.write(<span class="hljs-string">`Importing environment variables from <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.env(filename, cmd)
+        gemma.import.env(filename, collectOpts(cmd))
             .then(() =&gt; process.stdout.write(<span class="hljs-string">' done.'</span>));
     });
 
 program
     .command(<span class="hljs-string">'import-gff &lt;gff-filename&gt;'</span>)
     .alias(<span class="hljs-string">'ig'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'Import features from a GFF file into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
         process.stdout.write(<span class="hljs-string">`Importing GFF file <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.gff(filename, cmd)
+        gemma.import.gff(filename, collectOpts(cmd))
             .then(n =&gt; process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
     });
 
 program
     .command(<span class="hljs-string">'list-samples'</span>)
     .alias(<span class="hljs-string">'lss'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'List the distinct sample IDs'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        gemma.query.listSamples(last(args))
+        gemma.query.listSamples(collectOpts(last(args)))
             .then(samples =&gt; table(<span class="hljs-string">'Samples'</span>, samples));
     });
 
 program
     .command(<span class="hljs-string">'list-chromosomes'</span>)
     .alias(<span class="hljs-string">'lsc'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
     .description(<span class="hljs-string">'List the distinct chromosomes'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        gemma.query.listChromosomes(last(args))
+        gemma.query.listChromosomes(collectOpts(last(args)))
             .then(chromo =&gt; table(<span class="hljs-string">'Chromosomes'</span>, chromo));
     });
 

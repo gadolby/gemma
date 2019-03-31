@@ -22,58 +22,63 @@ const table = function(heading, data) {
     });
 };
 
-program.version('0.0.0', '-v, --version');
+const collectOpts = function(cmd, ...keys) {
+    let opts = {
+        database: cmd.parent.database
+    };
+    keys.forEach(k => opts[k] = cmd[k]);
+    return opts;
+};
+
+program
+    .version('0.0.0', '-v, --version')
+    .option('-d, --database <filename>', 'Database filename', './gemma.db');
 
 program
     .command('import-vcf <vcf-filename>')
     .alias('iv')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import a VCF file into database')
     .action(function(filename, cmd) {
         process.stdout.write(`Importing VCF file ${filename}...`);
-        gemma.import.vcf(filename, cmd)
+        gemma.import.vcf(filename, collectOpts(cmd))
             .then(n => process.stdout.write(` done. (${n} entries)`));
     });
 
 program
     .command('import-env <csv-filename>')
     .alias('ie')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import environmental data into database')
     .action(function(filename, cmd) {
         process.stdout.write(`Importing environment variables from ${filename}...`);
-        gemma.import.env(filename, cmd)
+        gemma.import.env(filename, collectOpts(cmd))
             .then(() => process.stdout.write(' done.'));
     });
 
 program
     .command('import-gff <gff-filename>')
     .alias('ig')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('Import features from a GFF file into database')
     .action(function(filename, cmd) {
         process.stdout.write(`Importing GFF file ${filename}...`);
-        gemma.import.gff(filename, cmd)
+        gemma.import.gff(filename, collectOpts(cmd))
             .then(n => process.stdout.write(` done. (${n} entries)`));
     });
 
 program
     .command('list-samples')
     .alias('lss')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('List the distinct sample IDs')
     .action(function(...args) {
-        gemma.query.listSamples(last(args))
+        gemma.query.listSamples(collectOpts(last(args)))
             .then(samples => table('Samples', samples));
     });
 
 program
     .command('list-chromosomes')
     .alias('lsc')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db')
     .description('List the distinct chromosomes')
     .action(function(...args) {
-        gemma.query.listChromosomes(last(args))
+        gemma.query.listChromosomes(collectOpts(last(args)))
             .then(chromo => table('Chromosomes', chromo));
     });
 
