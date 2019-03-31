@@ -31,7 +31,8 @@
 program
     .version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-string">'-v, --version'</span>)
     .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
-    .option(<span class="hljs-string">'-s, --silent'</span>, <span class="hljs-string">'Generate no non-essential logging'</span>);
+    .option(<span class="hljs-string">'-s, --silent'</span>, <span class="hljs-string">'Generate no non-essential logging'</span>)
+    .option(<span class="hljs-string">'--no-color'</span>, <span class="hljs-string">'Do not colorize output'</span>);
 
 program
     .command(<span class="hljs-string">'import-vcf &lt;vcf-filename&gt;'</span>)
@@ -71,7 +72,8 @@ program
     .alias(<span class="hljs-string">'lss'</span>)
     .description(<span class="hljs-string">'List the distinct sample IDs'</span>)
     .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> gemma.query.listSamples(collectOpts(last(args)));
+        <span class="hljs-keyword">const</span> cmd = collectOpts(last(args));
+        <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> gemma.query.listSamples(cmd);
         <span class="hljs-keyword">if</span> (samples.length) {
             table(<span class="hljs-string">'Samples'</span>, samples);
         } <span class="hljs-keyword">else</span> {
@@ -84,7 +86,8 @@ program
     .alias(<span class="hljs-string">'lsc'</span>)
     .description(<span class="hljs-string">'List the distinct chromosomes'</span>)
     .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        <span class="hljs-keyword">const</span> chromosomes = gemma.query.listChromosomes(collectOpts(last(args)));
+        <span class="hljs-keyword">const</span> cmd = collectOpts(last(args));
+        <span class="hljs-keyword">const</span> chromosomes = gemma.query.listChromosomes(cmd);
         <span class="hljs-keyword">if</span> (chromosomes.length) {
             table(<span class="hljs-string">'Chromosomes'</span>, chromosomes);
         } <span class="hljs-keyword">else</span> {

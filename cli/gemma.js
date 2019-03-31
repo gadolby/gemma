@@ -31,7 +31,8 @@ const collectOpts = function(cmd, ...keys) {
 program
     .version('0.0.0', '-v, --version')
     .option('-d, --database <filename>', 'Database filename', './gemma.db')
-    .option('-s, --silent', 'Generate no non-essential logging');
+    .option('-s, --silent', 'Generate no non-essential logging')
+    .option('--no-color', 'Do not colorize output');
 
 program
     .command('import-vcf <vcf-filename>')
@@ -71,7 +72,8 @@ program
     .alias('lss')
     .description('List the distinct sample IDs')
     .action(async function(...args) {
-        const samples = await gemma.query.listSamples(collectOpts(last(args)));
+        const cmd = collectOpts(last(args));
+        const samples = await gemma.query.listSamples(cmd);
         if (samples.length) {
             table('Samples', samples);
         } else {
@@ -84,7 +86,8 @@ program
     .alias('lsc')
     .description('List the distinct chromosomes')
     .action(async function(...args) {
-        const chromosomes = gemma.query.listChromosomes(collectOpts(last(args)));
+        const cmd = collectOpts(last(args));
+        const chromosomes = gemma.query.listChromosomes(cmd);
         if (chromosomes.length) {
             table('Chromosomes', chromosomes);
         } else {
