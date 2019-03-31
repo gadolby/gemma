@@ -8,7 +8,7 @@ const whiteSpace = (w) => new Array(w).fill(' ').join('');
 
 const table = function(heading, data) {
     const hlen = heading.length;
-    const dlen = Math.max(...data.map(d => d.length));
+    const dlen = Math.max(0, ...data.map(d => d.length));
     const width = Math.max(hlen, dlen);
     const hlPadWidth = Math.floor((width - hlen) / 2);
 
@@ -68,18 +68,26 @@ program
     .command('list-samples')
     .alias('lss')
     .description('List the distinct sample IDs')
-    .action(function(...args) {
-        gemma.query.listSamples(collectOpts(last(args)))
-            .then(samples => table('Samples', samples));
+    .action(async function(...args) {
+        const samples = await gemma.query.listSamples(collectOpts(last(args)));
+        if (samples.length) {
+            table('Samples', samples);
+        } else {
+            process.stdout.write(chalk.red.bold('no samples found'));
+        }
     });
 
 program
     .command('list-chromosomes')
     .alias('lsc')
     .description('List the distinct chromosomes')
-    .action(function(...args) {
-        gemma.query.listChromosomes(collectOpts(last(args)))
-            .then(chromo => table('Chromosomes', chromo));
+    .action(async function(...args) {
+        const chromosomes = gemma.query.listChromosomes(collectOpts(last(args)));
+        if (chromosomes.length) {
+            table('Chromosomes', chromosomes);
+        } else {
+            process.stdout.write(chalk.red.bold('no chromosomes found'));
+        }
     });
 
 program.on('command:*', function() {

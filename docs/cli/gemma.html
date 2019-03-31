@@ -68,18 +68,26 @@ program
     .command(<span class="hljs-string">'list-samples'</span>)
     .alias(<span class="hljs-string">'lss'</span>)
     .description(<span class="hljs-string">'List the distinct sample IDs'</span>)
-    .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        gemma.query.listSamples(collectOpts(last(args)))
-            .then(samples =&gt; table(<span class="hljs-string">'Samples'</span>, samples));
+    .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
+        <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> gemma.query.listSamples(collectOpts(last(args)));
+        <span class="hljs-keyword">if</span> (samples.length) {
+            table(<span class="hljs-string">'Samples'</span>, samples);
+        } <span class="hljs-keyword">else</span> {
+            process.stdout.write(chalk.red.bold(<span class="hljs-string">'no samples found'</span>));
+        }
     });
 
 program
     .command(<span class="hljs-string">'list-chromosomes'</span>)
     .alias(<span class="hljs-string">'lsc'</span>)
     .description(<span class="hljs-string">'List the distinct chromosomes'</span>)
-    .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
-        gemma.query.listChromosomes(collectOpts(last(args)))
-            .then(chromo =&gt; table(<span class="hljs-string">'Chromosomes'</span>, chromo));
+    .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">...args</span>) </span>{
+        <span class="hljs-keyword">const</span> chromosomes = gemma.query.listChromosomes(collectOpts(last(args)));
+        <span class="hljs-keyword">if</span> (chromosomes.length) {
+            table(<span class="hljs-string">'Chromosomes'</span>, chromosomes);
+        } <span class="hljs-keyword">else</span> {
+            process.stdout.write(chalk.red.bold(<span class="hljs-string">'no chromosomes found'</span>));
+        }
     });
 
 program.on(<span class="hljs-string">'command:*'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
