@@ -23,25 +23,25 @@
 };
 
 <span class="hljs-keyword">const</span> collectOpts = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cmd, ...keys</span>) </span>{
-    <span class="hljs-keyword">let</span> opts = {
-        database: cmd.parent.database
-    };
+    <span class="hljs-keyword">let</span> opts = <span class="hljs-built_in">Object</span>.assign({}, cmd.parent);
     keys.forEach(k =&gt; opts[k] = cmd[k]);
     <span class="hljs-keyword">return</span> opts;
 };
 
 program
     .version(<span class="hljs-string">'0.0.0'</span>, <span class="hljs-string">'-v, --version'</span>)
-    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>);
+    .option(<span class="hljs-string">'-d, --database &lt;filename&gt;'</span>, <span class="hljs-string">'Database filename'</span>, <span class="hljs-string">'./gemma.db'</span>)
+    .option(<span class="hljs-string">'-s, --silent'</span>, <span class="hljs-string">'Generate no non-essential logging'</span>);
 
 program
     .command(<span class="hljs-string">'import-vcf &lt;vcf-filename&gt;'</span>)
     .alias(<span class="hljs-string">'iv'</span>)
     .description(<span class="hljs-string">'Import a VCF file into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-        process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.vcf(filename, collectOpts(cmd))
-            .then(n =&gt; process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(<span class="hljs-string">`Importing VCF file <span class="hljs-subst">${filename}</span>...`</span>);
+        gemma.import.vcf(filename, cmd)
+            .then(n =&gt; cmd.silent || process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
     });
 
 program
@@ -49,9 +49,10 @@ program
     .alias(<span class="hljs-string">'ie'</span>)
     .description(<span class="hljs-string">'Import environmental data into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-        process.stdout.write(<span class="hljs-string">`Importing environment variables from <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.env(filename, collectOpts(cmd))
-            .then(() =&gt; process.stdout.write(<span class="hljs-string">' done.'</span>));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(<span class="hljs-string">`Importing environment variables from <span class="hljs-subst">${filename}</span>...`</span>);
+        gemma.import.env(filename, cmd)
+            .then(() =&gt; cmd.silent || process.stdout.write(<span class="hljs-string">' done.'</span>));
     });
 
 program
@@ -59,9 +60,10 @@ program
     .alias(<span class="hljs-string">'ig'</span>)
     .description(<span class="hljs-string">'Import features from a GFF file into database'</span>)
     .action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-        process.stdout.write(<span class="hljs-string">`Importing GFF file <span class="hljs-subst">${filename}</span>...`</span>);
-        gemma.import.gff(filename, collectOpts(cmd))
-            .then(n =&gt; process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(<span class="hljs-string">`Importing GFF file <span class="hljs-subst">${filename}</span>...`</span>);
+        gemma.import.gff(filename, cmd)
+            .then(n =&gt; cmd.silent || process.stdout.write(<span class="hljs-string">` done. (<span class="hljs-subst">${n}</span> entries)`</span>));
     });
 
 program

@@ -23,25 +23,25 @@ const table = function(heading, data) {
 };
 
 const collectOpts = function(cmd, ...keys) {
-    let opts = {
-        database: cmd.parent.database
-    };
+    let opts = Object.assign({}, cmd.parent);
     keys.forEach(k => opts[k] = cmd[k]);
     return opts;
 };
 
 program
     .version('0.0.0', '-v, --version')
-    .option('-d, --database <filename>', 'Database filename', './gemma.db');
+    .option('-d, --database <filename>', 'Database filename', './gemma.db')
+    .option('-s, --silent', 'Generate no non-essential logging');
 
 program
     .command('import-vcf <vcf-filename>')
     .alias('iv')
     .description('Import a VCF file into database')
     .action(function(filename, cmd) {
-        process.stdout.write(`Importing VCF file ${filename}...`);
-        gemma.import.vcf(filename, collectOpts(cmd))
-            .then(n => process.stdout.write(` done. (${n} entries)`));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(`Importing VCF file ${filename}...`);
+        gemma.import.vcf(filename, cmd)
+            .then(n => cmd.silent || process.stdout.write(` done. (${n} entries)`));
     });
 
 program
@@ -49,9 +49,10 @@ program
     .alias('ie')
     .description('Import environmental data into database')
     .action(function(filename, cmd) {
-        process.stdout.write(`Importing environment variables from ${filename}...`);
-        gemma.import.env(filename, collectOpts(cmd))
-            .then(() => process.stdout.write(' done.'));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(`Importing environment variables from ${filename}...`);
+        gemma.import.env(filename, cmd)
+            .then(() => cmd.silent || process.stdout.write(' done.'));
     });
 
 program
@@ -59,9 +60,10 @@ program
     .alias('ig')
     .description('Import features from a GFF file into database')
     .action(function(filename, cmd) {
-        process.stdout.write(`Importing GFF file ${filename}...`);
-        gemma.import.gff(filename, collectOpts(cmd))
-            .then(n => process.stdout.write(` done. (${n} entries)`));
+        cmd = collectOpts(cmd);
+        cmd.silent || process.stdout.write(`Importing GFF file ${filename}...`);
+        gemma.import.gff(filename, cmd)
+            .then(n => cmd.silent || process.stdout.write(` done. (${n} entries)`));
     });
 
 program
