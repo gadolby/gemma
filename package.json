@@ -4,11 +4,11 @@
   "description": "Mapping genomic data and such",
   "main": "lib/index.js",
   "bin": {
-    "gemma": "main.js"
+    "gemma": "cli/gemma.js"
   },
   "scripts": {
     "test": "jest",
-    "lint": "eslint main.js lib test"
+    "lint": "eslint cli lib test"
   },
   "repository": {
     "type": "git",

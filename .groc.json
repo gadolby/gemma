@@ -1,5 +1,5 @@
 {
-  "glob": ["README.md", "main.js", "lib/*.js"],
+  "glob": ["README.md", "cli/gemma.js", "lib/*.js"],
   "out": "docs",
   "github": false,
   "strip": [],

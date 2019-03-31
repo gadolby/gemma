@@ -34,6 +34,36 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     }, {
       "type": "folder",
       "data": {
+        "path": "cli",
+        "title": "cli"
+      },
+      "depth": 1,
+      "children": [
+        {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/cli/gemma.js",
+            "projectPath": "cli/gemma.js",
+            "targetPath": "cli/gemma",
+            "pageTitle": "cli/gemma",
+            "title": "gemma"
+          },
+          "depth": 2,
+          "outline": []
+        }
+      ]
+    }, {
+      "type": "folder",
+      "data": {
         "path": "lib",
         "title": "lib"
       },
@@ -141,26 +171,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "outline": []
         }
       ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "multiLineComment": ["/*", "*", "*/"],
-          "singleLineComment": ["//"],
-          "ignorePrefix": "}",
-          "foldPrefix": "^",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/home/dglmoore/gemma/main.js",
-        "projectPath": "main.js",
-        "targetPath": "main",
-        "pageTitle": "main",
-        "title": "main"
-      },
-      "depth": 1,
-      "outline": []
     }
   ];
 

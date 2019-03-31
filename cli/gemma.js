@@ -1,5 +1,5 @@
 const program = require('commander');
-const gemma = require('./lib');
+const gemma = require('../lib');
 
 program.version('0.0.0', '-v, --version');
 
