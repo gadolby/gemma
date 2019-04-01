@@ -28,7 +28,6 @@ describe('create database', function() {
             'alternates',
             'environment',
             'genes',
-            'subgenes',
             'variants'
         ]);
 
@@ -40,8 +39,7 @@ describe('create database', function() {
         ${'alternates'}  | ${[['AlternateID','int'],['Chromosome','string'],['Position','int'],['Alternate','string'],['SNP','int']]}
     ${'variants'}    | ${[['SampleID','string'],['Chromosome','string'],['Position','int'],['ChromosomeCopy','int'],['AlternateID','int']]}
     ${'environment'} | ${[['SampleID','string'],['Name','string'],['Value','string']]}
-    ${'genes'}       | ${[['GeneID','string'],['Source','string'],['Start','int'],['End','int'],['Note','string']]}
-    ${'subgenes'}    | ${[['GeneID','string'],['ID','string'],['Source','string'],['Type','string'],['Start','int'],['End','int'],['Note','string']]}
+    ${'genes'}       | ${[['ParentID','string'],['ID','string'],['Source','string'],['Type','string'],['Start','int'],['End','int'],['Note','string']]}
     `('.creates columns for table $table', async function({ table, expectedColumns }) {
     const sorter = (a, b) => (a[0] < b[0]) ? -1 : (a[0] > b[0]) ? 1 : 0;
     const db = await Database(dbFile);
@@ -180,39 +178,15 @@ describe('can insert gene features', function() {
         };
         const db = await Database(dbFile);
         await db.insertGeneFeature(entry);
-        await expect(db.handle.all('SELECT * FROM genes')).resolves.toEqual([
-            { GeneID: 'MyGene', Source: 'maker', Start: 123, End: 256, Note: 'Similar to Doug' }
-        ]);
-        await expect(db.handle.all('SELECT * FROM subgenes')).resolves.toHaveLength(0);
-
-        return await db.close();
-    });
-
-    test('.inserts subgenes', async function() {
-        const entry = {
-            source: 'maker',
-            type: 'exon',
-            start: 123,
-            end: 152,
-            attributes: {
-                ID: 'MyGene:exon',
-                Parent: 'MyGene'
-            }
-        };
-        const db = await Database(dbFile);
-        await db.insertGeneFeature(entry);
-        await expect(db.handle.all('SELECT * FROM subgenes')).resolves.toEqual([
-            {
-                GeneID: 'MyGene',
-                ID: 'MyGene:exon',
-                Source: 'maker',
-                Type: 'exon',
-                Start: 123,
-                End: 152,
-                Note: null
-            }
-        ]);
-        await expect(db.handle.all('SELECT * FROM genes')).resolves.toHaveLength(0);
+        await expect(db.handle.all('SELECT * FROM genes')).resolves.toEqual([{
+            ParentID: 'MyGene',
+            ID: 'MyGene',
+            Type: 'gene',
+            Source: 'maker',
+            Start: 123,
+            End: 256,
+            Note: 'Similar to Doug'
+        }]);
 
         return await db.close();
     });

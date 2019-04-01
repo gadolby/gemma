@@ -153,16 +153,31 @@ describe('import gff', function() {
 
         const db = await Database(dbFile);
         const genes = await db.handle.all('SELECT * FROM genes');
-        expect(genes.sort(geneSorter)).toEqual([
-            { GeneID: 'SPLAT', Source: 'maker', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' }
-        ]);
-
-        const subgenes = await db.handle.all('SELECT * FROM subgenes');
-        expect(subgenes.sort(geneSorter)).toEqual([
-            { GeneID: 'SPLAT', ID: 'SPLAT-RA', Source: 'maker', Type: 'mRNA', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' },
-            { GeneID: 'SPLAT-RA', ID: 'SPLAT-RA:exon:4045', Source: 'maker', Type: 'exon', Start: 2446, End: 2545, Note: null }
-        ]);
-
+        expect(genes.sort(geneSorter)).toEqual([{
+            ParentID: null,
+            ID: 'SPLAT',
+            Source: 'maker',
+            Type: 'gene',
+            Start: 2446,
+            End: 17292,
+            Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)'
+        }, {
+            ParentID: 'SPLAT',
+            ID: 'SPLAT-RA',
+            Source: 'maker',
+            Type: 'mRNA',
+            Start: 2446,
+            End: 17292,
+            Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)'
+        }, {
+            ParentID: 'SPLAT-RA',
+            ID: 'SPLAT-RA:exon:4045',
+            Source: 'maker',
+            Type: 'exon',
+            Start: 2446,
+            End: 2545,
+            Note: null
+        }]);
         return await db.close();
     });
 });
