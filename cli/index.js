@@ -1,33 +1,10 @@
+// # gemma
+
 const chalk = require('chalk');
-const signale = require('signale');
 const gemma = require('../lib');
 const program = require('commander');
-
-const last = (arr) => arr[arr.length - 1];
-
-const whiteSpace = (w) => new Array(w).fill(' ').join('');
-
-const table = function(heading, data) {
-    const hlen = heading.length;
-    const dlen = Math.max(0, ...data.map(d => d.length));
-    const width = Math.max(hlen, dlen);
-    const hlPadWidth = Math.floor((width - hlen) / 2);
-
-    const hlPad = whiteSpace(hlPadWidth);
-    const hrPad = whiteSpace(width - hlen - hlPadWidth);
-    const dPad = whiteSpace(Math.floor((width - dlen) / 2));
-
-    process.stdout.write(chalk.underline(hlPad + heading + hrPad) + '\n\n');
-    data.forEach(function(row) {
-        process.stdout.write(`${dPad}${row}\n`);
-    });
-};
-
-const collectOpts = function(cmd, ...keys) {
-    let opts = Object.assign({}, cmd.parent);
-    keys.forEach(k => opts[k] = cmd[k]);
-    return opts;
-};
+const signale = require('signale');
+const util = require('./util');
 
 program
     .version('0.0.0', '-v, --version')
@@ -41,7 +18,7 @@ program
     .description('Import a VCF file into database')
     .option('-a, --append', 'Append data to the database')
     .action(function(filename, cmd) {
-        cmd = collectOpts(cmd, 'append');
+        cmd = util.collectOpts(cmd, 'append');
         cmd.silent || signale.await(`Importing VCF file ${filename}`);
         gemma.import.vcf(filename, cmd)
             .then(n => cmd.silent || signale.complete(`${n} VCF entries imported`))
@@ -60,7 +37,7 @@ program
     .description('Import environmental data into database')
     .option('-a, --append', 'Append data to the database')
     .action(function(filename, cmd) {
-        cmd = collectOpts(cmd, 'append');
+        cmd = util.collectOpts(cmd, 'append');
         cmd.silent || signale.await(`Importing environment variables from ${filename}`);
         gemma.import.env(filename, cmd)
             .then(() => cmd.silent || signale.complete('environment imported'))
@@ -78,7 +55,7 @@ program
     .alias('ig')
     .description('Import features from a GFF file into database')
     .action(function(filename, cmd) {
-        cmd = collectOpts(cmd);
+        cmd = util.collectOpts(cmd);
         cmd.silent || signale.await(`Importing GFF file ${filename}`);
         gemma.import.gff(filename, cmd)
             .then(n => cmd.silent || signale.complete(`${n} GFF entries imported`))
@@ -90,10 +67,10 @@ program
     .alias('lss')
     .description('List the distinct sample IDs')
     .action(async function(...args) {
-        const cmd = collectOpts(last(args));
+        const cmd = util.collectOpts(util.last(args));
         const samples = await gemma.query.listSamples(cmd);
         if (samples.length) {
-            table('Samples', samples);
+            util.table('Samples', samples);
         } else {
             process.stdout.write(chalk.red.bold('no samples found'));
         }
@@ -104,10 +81,10 @@ program
     .alias('lsc')
     .description('List the distinct chromosomes')
     .action(async function(...args) {
-        const cmd = collectOpts(last(args));
+        const cmd = util.collectOpts(util.last(args));
         const chromosomes = gemma.query.listChromosomes(cmd);
         if (chromosomes.length) {
-            table('Chromosomes', chromosomes);
+            util.table('Chromosomes', chromosomes);
         } else {
             process.stdout.write(chalk.red.bold('no chromosomes found'));
         }

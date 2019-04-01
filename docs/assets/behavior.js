@@ -124,7 +124,37 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "cli/index.js",
             "targetPath": "cli/index",
             "pageTitle": "cli/index",
-            "title": "index"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "gemma",
+                "slug": "gemma",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "gemma"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/gemma/cli/util.js",
+            "projectPath": "cli/util.js",
+            "targetPath": "cli/util",
+            "pageTitle": "cli/util",
+            "title": "util"
           },
           "depth": 2,
           "outline": []
