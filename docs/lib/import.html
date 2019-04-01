@@ -103,8 +103,7 @@
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
     <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'environment'</span>);
     <span class="hljs-keyword">if</span> (empty || cmd.append) {
-        <span class="hljs-keyword">await</span> db.insertEnvironment(samples);
-        <span class="hljs-keyword">await</span> db.close();
+        <span class="hljs-keyword">await</span> db.insertEnvironment(samples).finally(() =&gt; db.close());
     } <span class="hljs-keyword">else</span> {
         <span class="hljs-keyword">await</span> db.close();
         <span class="hljs-keyword">throw</span> <span class="hljs-string">'Environment data has already been imported; rerun with --append option to force'</span>;
