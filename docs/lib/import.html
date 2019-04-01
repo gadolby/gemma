@@ -4,8 +4,8 @@
 <span class="hljs-keyword">const</span> gff = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-gff'</span>);
 <span class="hljs-keyword">const</span> csv = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csv'</span>);
 
-<span class="hljs-keyword">let</span> importVCF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
+<span class="hljs-keyword">const</span> importVCF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'variants'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'alternates'</span>));
 
@@ -36,8 +36,8 @@
     }
 };
 
-<span class="hljs-keyword">let</span> importGFF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
+<span class="hljs-keyword">const</span> importGFF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'genes'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'subgenes'</span>));
     <span class="hljs-keyword">if</span> (empty) {
@@ -71,7 +71,7 @@
                 <span class="hljs-keyword">return</span> reject(err);
             }
 
-            <span class="hljs-keyword">let</span> sampleid_index = data[<span class="hljs-number">0</span>].findIndex(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+            <span class="hljs-keyword">const</span> sampleid_index = data[<span class="hljs-number">0</span>].findIndex(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
                 <span class="hljs-keyword">return</span> value.trim().toLowerCase() === <span class="hljs-string">'sampleid'</span>;
             });
 
@@ -79,9 +79,9 @@
                 <span class="hljs-keyword">return</span> reject(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Environmental data does not include SampleIDs'</span>));
             }
 
-            <span class="hljs-keyword">let</span> samples = [];
+            <span class="hljs-keyword">const</span> samples = [];
             <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>; i &lt; data.length; ++i) {
-                <span class="hljs-keyword">let</span> sid = data[i][sampleid_index];
+                <span class="hljs-keyword">const</span> sid = data[i][sampleid_index];
                 <span class="hljs-keyword">if</span> (sid <span class="hljs-keyword">in</span> samples) {
                     <span class="hljs-keyword">return</span> reject(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`duplicate SampleID <span class="hljs-subst">${sid}</span>`</span>));
                 }
@@ -97,9 +97,9 @@
     });
 };
 
-<span class="hljs-keyword">let</span> importEnv = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
-    <span class="hljs-keyword">let</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
-    <span class="hljs-keyword">let</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
+<span class="hljs-keyword">const</span> importEnv = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+    <span class="hljs-keyword">const</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
+    <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
     <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'environment'</span>);
     <span class="hljs-keyword">if</span> (empty || cmd.append) {
