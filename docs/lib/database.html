@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><title>lib/database</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/database"><meta name="groc-project-path" content="lib/database.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/lib/database.js">lib/database.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> sqlite = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sqlite'</span>);
 
-<span class="hljs-keyword">const</span> is_snp = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt</span>) </span>{
+<span class="hljs-keyword">const</span> isSNP = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt</span>) </span>{
     <span class="hljs-keyword">const</span> a = alt.toUpperCase();
     <span class="hljs-keyword">return</span> [<span class="hljs-string">'A'</span>,<span class="hljs-string">'T'</span>,<span class="hljs-string">'C'</span>,<span class="hljs-string">'G'</span>].find(b =&gt; a === b) !== <span class="hljs-literal">undefined</span>;
 };
@@ -20,17 +20,17 @@
 
     <span class="hljs-keyword">let</span> close = () =&gt; db.close();
 
-    <span class="hljs-keyword">let</span> insert_alternates = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+    <span class="hljs-keyword">let</span> insertAlternates = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO alternates (AlternateID, Chromosome, Position, Alternate, SNP) VALUES (?,?,?,?,?)'</span>;
 
         <span class="hljs-keyword">let</span> promises = [db.run(query, <span class="hljs-number">0</span>, entry.chrom, entry.pos, entry.ref, <span class="hljs-number">0</span>)];
         entry.alt.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">alt, i</span>) </span>{
-            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chrom, entry.pos, alt, is_snp(alt)));
+            promises.push(db.run(query, i + <span class="hljs-number">1</span>, entry.chrom, entry.pos, alt, isSNP(alt)));
         });
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
     };
 
-    <span class="hljs-keyword">let</span> insert_variants = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+    <span class="hljs-keyword">let</span> insertVariants = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO variants (SampleID, Chromosome, Position, ChromosomeCopy, AlternateID) VALUES (?,?,?,?,?)'</span>;
         <span class="hljs-keyword">let</span> promises = [];
         entry.sampleinfo.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">variant</span>) </span>{
@@ -42,11 +42,11 @@
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
     };
 
-    <span class="hljs-keyword">let</span> insert_entry = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all([ insert_alternates(entry), insert_variants(entry) ]);
+    <span class="hljs-keyword">let</span> insertVariantCall = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all([ insertAlternates(entry), insertVariants(entry) ]);
     };
 
-    <span class="hljs-keyword">let</span> insert_environment = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">env</span>) </span>{
+    <span class="hljs-keyword">let</span> insertEnvironment = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">env</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO environment (SampleID, Name, Value) VALUES (?,?,?)'</span>;
         <span class="hljs-keyword">let</span> promises = [];
         <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> sampleid <span class="hljs-keyword">in</span> env) {
@@ -59,23 +59,23 @@
         <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(promises);
     };
 
-    <span class="hljs-keyword">let</span> insert_gene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+    <span class="hljs-keyword">let</span> insertGene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO genes (GeneID, Source, Start, End, Note) VALUES (?,?,?,?,?)'</span>;
         <span class="hljs-keyword">const</span> { ID, Note } = entry.attributes;
         <span class="hljs-keyword">return</span> db.run(query, ID, entry.source, entry.start, entry.end, Note);
     };
 
-    <span class="hljs-keyword">let</span> insert_subgene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+    <span class="hljs-keyword">let</span> insertSubgene = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">let</span> query = <span class="hljs-string">'INSERT INTO subgenes (GeneID, ID, Source, Type, Start, End, Note) VALUES (?,?,?,?,?,?,?)'</span>;
         <span class="hljs-keyword">const</span> { Parent, ID, Note } = entry.attributes;
         <span class="hljs-keyword">return</span> db.run(query, Parent, ID, entry.source, entry.type, entry.start, entry.end, Note);
     };
 
-    <span class="hljs-keyword">let</span> insert_gene_feature = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+    <span class="hljs-keyword">let</span> insertGeneFeature = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
         <span class="hljs-keyword">if</span> (entry.type.toLowerCase() === <span class="hljs-string">'gene'</span>) {
-            <span class="hljs-keyword">return</span> insert_gene(entry);
+            <span class="hljs-keyword">return</span> insertGene(entry);
         } <span class="hljs-keyword">else</span> {
-            <span class="hljs-keyword">return</span> insert_subgene(entry);
+            <span class="hljs-keyword">return</span> insertSubgene(entry);
         }
     };
 
@@ -117,6 +117,6 @@
             <span class="hljs-keyword">return</span> db;
         },
 
-        close, insert_entry, insert_environment, insert_gene_feature, list, query, isEmpty
+        close, insertVariantCall, insertEnvironment, insertGeneFeature, list, query, isEmpty
     });
 };</div></div></div></div></body></html>

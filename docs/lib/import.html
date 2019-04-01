@@ -4,7 +4,7 @@
 <span class="hljs-keyword">const</span> gff = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-gff'</span>);
 <span class="hljs-keyword">const</span> csv = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csv'</span>);
 
-<span class="hljs-keyword">let</span> import_vcf = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+<span class="hljs-keyword">let</span> importVCF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'variants'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'alternates'</span>));
@@ -19,7 +19,7 @@
                 vcf.pause();
                 n += <span class="hljs-number">1</span>;
                 <span class="hljs-keyword">try</span> {
-                    <span class="hljs-keyword">await</span> db.insert_entry(entry);
+                    <span class="hljs-keyword">await</span> db.insertVariantCall(entry);
                     vcf.resume();
                 } <span class="hljs-keyword">catch</span>(err) {
                     vcf.emit(<span class="hljs-string">'error'</span>, err);
@@ -36,7 +36,7 @@
     }
 };
 
-<span class="hljs-keyword">let</span> import_gff = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+<span class="hljs-keyword">let</span> importGFF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'genes'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'subgenes'</span>));
@@ -48,7 +48,7 @@
             g.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
                 n += <span class="hljs-number">1</span>;
                 <span class="hljs-keyword">try</span> {
-                    <span class="hljs-keyword">await</span> db.insert_gene_feature(entry);
+                    <span class="hljs-keyword">await</span> db.insertGeneFeature(entry);
                 } <span class="hljs-keyword">catch</span>(err) {
                     g.emit(<span class="hljs-string">'error'</span>, err);
                 }
@@ -97,13 +97,13 @@
     });
 };
 
-<span class="hljs-keyword">let</span> import_env = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
+<span class="hljs-keyword">let</span> importEnv = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
     <span class="hljs-keyword">let</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
     <span class="hljs-keyword">let</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
     <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'environment'</span>);
     <span class="hljs-keyword">if</span> (empty || cmd.append) {
-        <span class="hljs-keyword">await</span> db.insert_environment(samples);
+        <span class="hljs-keyword">await</span> db.insertEnvironment(samples);
         <span class="hljs-keyword">await</span> db.close();
     } <span class="hljs-keyword">else</span> {
         <span class="hljs-keyword">await</span> db.close();
@@ -111,8 +111,4 @@
     }
 };
 
-<span class="hljs-built_in">module</span>.exports = {
-    vcf: import_vcf,
-    gff: import_gff,
-    env: import_env
-};</div></div></div></div></body></html>
+<span class="hljs-built_in">module</span>.exports = { vcf: importVCF, gff: importGFF, env: importEnv };</div></div></div></div></body></html>

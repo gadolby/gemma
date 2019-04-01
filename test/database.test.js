@@ -53,7 +53,7 @@ describe('create database', function() {
 });
 });
 
-describe('can insert entries', function() {
+describe('can insert variant calls', function() {
     const entry = {
         sampleinfo: [
             { name: 'sample1', GT: ['0','1'] },
@@ -69,7 +69,7 @@ describe('can insert entries', function() {
 
     test('.inserts alternates', async function() {
         const db = await Database(dbFile);
-        await db.insert_entry(entry);
+        await db.insertVariantCall(entry);
         const rows = await db.handle.all('SELECT * FROM alternates');
         expect(rows.sort((a,b) => a.AlternateID - b.AlternateID)).toEqual([
             { AlternateID: 0, Alternate: 'A',   Chromosome: 'scaffold_1', Position: 10, SNP: 0 },
@@ -93,7 +93,7 @@ describe('can insert entries', function() {
             }
         };
         const db = await Database(dbFile);
-        await db.insert_entry(entry);
+        await db.insertVariantCall(entry);
         const rows = await db.handle.all('SELECT * FROM variants');
         expect(rows.sort(sorter)).toEqual([
             { SampleID: 'sample1', Chromosome: 'scaffold_1', Position: 10, ChromosomeCopy: 1, AlternateID: 0 },
@@ -143,7 +143,7 @@ test('can add environmental variables', async function() {
         },
     };
     const db = await Database(dbFile);
-    await db.insert_environment(env);
+    await db.insertEnvironment(env);
     const rows = await db.handle.all('SELECT * FROM environment');
     expect(rows.sort(sorter)).toEqual([
         { 'SampleID': 'sample1', 'Name': 'elevation',    'Value': 1000 },
@@ -179,7 +179,7 @@ describe('can insert gene features', function() {
             }
         };
         const db = await Database(dbFile);
-        await db.insert_gene_feature(entry);
+        await db.insertGeneFeature(entry);
         await expect(db.handle.all('SELECT * FROM genes')).resolves.toEqual([
             { GeneID: 'MyGene', Source: 'maker', Start: 123, End: 256, Note: 'Similar to Doug' }
         ]);
@@ -200,7 +200,7 @@ describe('can insert gene features', function() {
             }
         };
         const db = await Database(dbFile);
-        await db.insert_gene_feature(entry);
+        await db.insertGeneFeature(entry);
         await expect(db.handle.all('SELECT * FROM subgenes')).resolves.toEqual([
             {
                 GeneID: 'MyGene',
@@ -257,7 +257,7 @@ describe('can query', function() {
 
     test('.can list from a table', async function() {
         const db = await Database(dbFile);
-        await db.insert_entry(entry);
+        await db.insertVariantCall(entry);
 
         await expect(db.list('alternates', 'Chromosome')).resolves.toEqual([
             'scaffold_1', 'scaffold_1', 'scaffold_1', 'scaffold_1', 'scaffold_1'
@@ -272,8 +272,8 @@ describe('can query', function() {
 
     test('.can query variants', async function() {
         const db = await Database(dbFile);
-        await db.insert_entry(entry);
-        await db.insert_environment(env);
+        await db.insertVariantCall(entry);
+        await db.insertEnvironment(env);
 
         await expect(db.query('sample1', 'scaffold_1', 10)).resolves.toEqual({
             SampleId: 'sample1',
