@@ -25,12 +25,81 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "slug": "gemma",
             "isFileHeader": true
           },
-          "depth": 1
+          "depth": 1,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Installation",
+                "slug": "installation"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Getting Help",
+                "slug": "getting-help"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Relevant Publications",
+                "slug": "relevant-publications"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Copyright and Licensing",
+                "slug": "copyright-and-licensing"
+              },
+              "depth": 2
+            }
+          ]
         },
         "title": "Gemma"
       },
       "depth": 1,
-      "outline": []
+      "outline": [
+        {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Installation",
+            "slug": "installation"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Getting Help",
+            "slug": "getting-help"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Relevant Publications",
+            "slug": "relevant-publications"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Copyright and Licensing",
+            "slug": "copyright-and-licensing"
+          },
+          "depth": 2
+        }
+      ]
     }, {
       "type": "folder",
       "data": {
