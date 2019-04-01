@@ -14,7 +14,7 @@ beforeEach(async function() {
     return expect(jdb.Database(dbFile).then(db => db.close())).resolves;
 });
 
-afterAll(function() {
+afterEach(function() {
     if (fs.existsSync(dbFile)) {
         fs.unlinkSync(dbFile);
     }

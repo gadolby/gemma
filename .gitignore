@@ -60,6 +60,6 @@ typings/
 # next.js build output
 .next
 
-# Jenna database
-jenna.db
+# Gemma database
+gemma.db
 data

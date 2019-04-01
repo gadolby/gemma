@@ -125,35 +125,50 @@ describe('import vcf', function() {
 
         return await db.close();
     });
+
+    test('.error for multiple import without append', async function() {
+        const vcfFile = path.join(assetsPath, 'vcf', 'valid', 'sample.vcf');
+        await vcf(vcfFile, { database: dbFile });
+        return expect(vcf(vcfFile, { database: dbFile })).rejects.toMatch(/already been imported/);
+    });
+
+    test('.error for multiple of same vcf', async function() {
+        const vcfFile = path.join(assetsPath, 'vcf', 'valid', 'sample.vcf');
+        await vcf(vcfFile, { database: dbFile });
+        return expect(vcf(vcfFile, { database: dbFile, append: true }))
+            .rejects.toThrow(/SQLITE_CONSTRAINT/);
+    });
 });
 
-test('can import gff', async function() {
-    const geneSorter = function(a, b) {
-        const start = fieldSorter(a, b, 'Start');
-        const end = -1 * fieldSorter(a, b, 'End');
-        return (start) ? start : end;
-    };
+describe('import gff', function() {
+    test('.can', async function() {
+        const geneSorter = function(a, b) {
+            const start = fieldSorter(a, b, 'Start');
+            const end = -1 * fieldSorter(a, b, 'End');
+            return (start) ? start : end;
+        };
 
-    const n = await gff(gffFile, { database: dbFile });
-    expect(n).toBe(3);
+        const n = await gff(gffFile, { database: dbFile });
+        expect(n).toBe(3);
 
-    const db = await Database(dbFile);
-    const genes = await db.handle.all('SELECT * FROM genes');
-    expect(genes.sort(geneSorter)).toEqual([
-        { GeneID: 'SPLAT', Source: 'maker', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' }
-    ]);
+        const db = await Database(dbFile);
+        const genes = await db.handle.all('SELECT * FROM genes');
+        expect(genes.sort(geneSorter)).toEqual([
+            { GeneID: 'SPLAT', Source: 'maker', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' }
+        ]);
 
-    const subgenes = await db.handle.all('SELECT * FROM subgenes');
-    expect(subgenes.sort(geneSorter)).toEqual([
-        { GeneID: 'SPLAT', ID: 'SPLAT-RA', Source: 'maker', Type: 'mRNA', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' },
-        { GeneID: 'SPLAT-RA', ID: 'SPLAT-RA:exon:4045', Source: 'maker', Type: 'exon', Start: 2446, End: 2545, Note: null }
-    ]);
+        const subgenes = await db.handle.all('SELECT * FROM subgenes');
+        expect(subgenes.sort(geneSorter)).toEqual([
+            { GeneID: 'SPLAT', ID: 'SPLAT-RA', Source: 'maker', Type: 'mRNA', Start: 2446, End: 17292, Note: 'Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii)' },
+            { GeneID: 'SPLAT-RA', ID: 'SPLAT-RA:exon:4045', Source: 'maker', Type: 'exon', Start: 2446, End: 2545, Note: null }
+        ]);
 
-    return await db.close();
+        return await db.close();
+    });
 });
 
-describe('enviroment', function() {
-    test('.can import', async function() {
+describe('import enviroment', function() {
+    test('.can', async function() {
         const envSorter = function (a, b) {
             const s = fieldSorter(a, b, 'SampleID');
             return s ? s : fieldSorter(a, b, 'Name');
@@ -168,6 +183,16 @@ describe('enviroment', function() {
         ]);
 
         return await db.close();
+    });
+
+    test('.error for multiple import without append', async function() {
+        await env(ecoFile, { database: dbFile });
+        return expect(env(ecoFile, { database: dbFile })).rejects.toMatch(/already been imported/);
+    });
+
+    test('.error for multiple of same env', async function() {
+        await env(ecoFile, { database: dbFile });
+        return expect(env(ecoFile, { database: dbFile, append: true })).rejects.toThrow();
     });
 
     test.each`

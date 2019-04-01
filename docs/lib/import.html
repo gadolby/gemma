@@ -7,46 +7,61 @@
 <span class="hljs-keyword">let</span> import_vcf = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
-        <span class="hljs-keyword">const</span> vcf = VCF();
-        vcf.read(filename);
+    <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'variants'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'alternates'</span>));
 
-        <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
-        vcf.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
-            n += <span class="hljs-number">1</span>;
-            <span class="hljs-keyword">try</span> {
-                <span class="hljs-keyword">await</span> db.insert_entry(entry);
-            } <span class="hljs-keyword">catch</span>(err) {
-                vcf.emit(<span class="hljs-string">'error'</span>, err);
-            }
-        });
+    <span class="hljs-keyword">if</span> (empty || cmd.append) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
+            <span class="hljs-keyword">const</span> vcf = VCF();
+            vcf.read(filename);
 
-        vcf.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
+            <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
+            vcf.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+                vcf.pause();
+                n += <span class="hljs-number">1</span>;
+                <span class="hljs-keyword">try</span> {
+                    <span class="hljs-keyword">await</span> db.insert_entry(entry);
+                    vcf.resume();
+                } <span class="hljs-keyword">catch</span>(err) {
+                    vcf.emit(<span class="hljs-string">'error'</span>, err);
+                }
+            });
 
-        vcf.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
-    }).finally(() =&gt; db.close());
+            vcf.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
+
+            vcf.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
+        }).finally(() =&gt; db.close());
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">await</span> db.close();
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'VCF data has already been imported; rerun with --append option to force'</span>;
+    }
 };
 
 <span class="hljs-keyword">let</span> import_gff = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
     <span class="hljs-keyword">let</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
-        <span class="hljs-keyword">const</span> g = gff.read(filename);
+    <span class="hljs-keyword">const</span> empty = (<span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'genes'</span>) &amp;&amp; <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'subgenes'</span>));
+    <span class="hljs-keyword">if</span> (empty) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
+            <span class="hljs-keyword">const</span> g = gff.read(filename);
 
-        <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
-        g.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
-            n += <span class="hljs-number">1</span>;
-            <span class="hljs-keyword">try</span> {
-                <span class="hljs-keyword">await</span> db.insert_gene_feature(entry);
-            } <span class="hljs-keyword">catch</span>(err) {
-                g.emit(<span class="hljs-string">'error'</span>, g);
-            }
-        });
+            <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
+            g.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+                n += <span class="hljs-number">1</span>;
+                <span class="hljs-keyword">try</span> {
+                    <span class="hljs-keyword">await</span> db.insert_gene_feature(entry);
+                } <span class="hljs-keyword">catch</span>(err) {
+                    g.emit(<span class="hljs-string">'error'</span>, err);
+                }
+            });
 
-        g.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
+            g.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
 
-        g.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
-    }).finally(() =&gt; db.close());
+            g.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
+        }).finally(() =&gt; db.close());
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">await</span> db.close();
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'GFF data has already been imported; the --append option is not supported yet'</span>;
+    }
 };
 
 <span class="hljs-keyword">const</span> parseEnv = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -86,8 +101,14 @@
     <span class="hljs-keyword">let</span> file = <span class="hljs-keyword">await</span> fs.readFile(filename);
     <span class="hljs-keyword">let</span> samples = <span class="hljs-keyword">await</span> parseEnv(file);
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
-    <span class="hljs-keyword">await</span> db.insert_environment(samples);
-    <span class="hljs-keyword">await</span> db.close();
+    <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'environment'</span>);
+    <span class="hljs-keyword">if</span> (empty || cmd.append) {
+        <span class="hljs-keyword">await</span> db.insert_environment(samples);
+        <span class="hljs-keyword">await</span> db.close();
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">await</span> db.close();
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'Environment data has already been imported; rerun with --append option to force'</span>;
+    }
 };
 
 <span class="hljs-built_in">module</span>.exports = {

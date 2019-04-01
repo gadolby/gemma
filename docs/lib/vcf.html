@@ -183,9 +183,9 @@
 
     vcf.readStream = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">instream, filepath='&lt;stream&gt;'</span>) </span>{
         <span class="hljs-keyword">this</span>.parser = Parser(filepath);
-        <span class="hljs-keyword">const</span> rl = readline.createInterface(instream);
+        <span class="hljs-keyword">this</span>.rl = readline.createInterface(instream);
 
-        rl.on(<span class="hljs-string">'line'</span>, (line) =&gt; {
+        <span class="hljs-keyword">this</span>.rl.on(<span class="hljs-string">'line'</span>, (line) =&gt; {
             <span class="hljs-keyword">try</span> {
                 <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">this</span>.parser.line(line);
                 <span class="hljs-keyword">if</span> (data) {
@@ -196,12 +196,20 @@
             }
         });
 
-        rl.on(<span class="hljs-string">'close'</span>, () =&gt; vcf.emit(<span class="hljs-string">'end'</span>));
+        <span class="hljs-keyword">this</span>.rl.on(<span class="hljs-string">'close'</span>, () =&gt; vcf.emit(<span class="hljs-string">'end'</span>));
 
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
     };
 
     vcf.read = (filepath) =&gt; vcf.readStream(fs.createReadStream(filepath), filepath);
+
+    vcf.pause = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">this</span>.rl &amp;&amp; <span class="hljs-keyword">this</span>.rl.pause();
+    };
+
+    vcf.resume = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">this</span>.rl &amp;&amp; <span class="hljs-keyword">this</span>.rl.resume();
+    };
 
     <span class="hljs-keyword">return</span> vcf;
 };</div></div></div></div></body></html>

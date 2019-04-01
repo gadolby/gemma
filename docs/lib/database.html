@@ -107,11 +107,16 @@
         });
     };
 
+    <span class="hljs-keyword">const</span> isEmpty = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">table</span>) </span>{
+        <span class="hljs-keyword">const</span> [n] = <span class="hljs-keyword">await</span> db.all(<span class="hljs-string">`SELECT COUNT(*) FROM <span class="hljs-subst">${table}</span>`</span>);
+        <span class="hljs-keyword">return</span> n[<span class="hljs-string">'COUNT(*)'</span>] === <span class="hljs-number">0</span>;
+    };
+
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.create({
         get handle() {
             <span class="hljs-keyword">return</span> db;
         },
 
-        close, insert_entry, insert_environment, insert_gene_feature, list, query
+        close, insert_entry, insert_environment, insert_gene_feature, list, query, isEmpty
     });
 };</div></div></div></div></body></html>

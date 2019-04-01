@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const signale = require('signale');
 const gemma = require('../lib');
 const program = require('commander');
 
@@ -38,22 +39,38 @@ program
     .command('import-vcf <vcf-filename>')
     .alias('iv')
     .description('Import a VCF file into database')
+    .option('-a, --append', 'Append data to the database')
     .action(function(filename, cmd) {
-        cmd = collectOpts(cmd);
-        cmd.silent || process.stdout.write(`Importing VCF file ${filename}...`);
+        cmd = collectOpts(cmd, 'append');
+        cmd.silent || signale.await(`Importing VCF file ${filename}`);
         gemma.import.vcf(filename, cmd)
-            .then(n => cmd.silent || process.stdout.write(` done. (${n} entries)`));
+            .then(n => cmd.silent || signale.complete(`${n} VCF entries imported`))
+            .catch(function(err) {
+                if (err.code && err.code === 'SQLITE_CONSTRAINT') {
+                    signale.error('An entry in the VCF has already been imported into the database');
+                } else {
+                    signale.error(err);
+                }
+            });
     });
 
 program
     .command('import-env <csv-filename>')
     .alias('ie')
     .description('Import environmental data into database')
+    .option('-a, --append', 'Append data to the database')
     .action(function(filename, cmd) {
-        cmd = collectOpts(cmd);
-        cmd.silent || process.stdout.write(`Importing environment variables from ${filename}...`);
+        cmd = collectOpts(cmd, 'append');
+        cmd.silent || signale.await(`Importing environment variables from ${filename}`);
         gemma.import.env(filename, cmd)
-            .then(() => cmd.silent || process.stdout.write(' done.'));
+            .then(() => cmd.silent || signale.complete('environment imported'))
+            .catch(function(err) {
+                if (err.code && err.code === 'SQLITE_CONSTRAINT') {
+                    signale.error('An environment variable has already been imported into the database');
+                } else {
+                    signale.error(err);
+                }
+            });
     });
 
 program
@@ -62,9 +79,10 @@ program
     .description('Import features from a GFF file into database')
     .action(function(filename, cmd) {
         cmd = collectOpts(cmd);
-        cmd.silent || process.stdout.write(`Importing GFF file ${filename}...`);
+        cmd.silent || signale.await(`Importing GFF file ${filename}`);
         gemma.import.gff(filename, cmd)
-            .then(n => cmd.silent || process.stdout.write(` done. (${n} entries)`));
+            .then(n => cmd.silent || signale.complete(`${n} GFF entries imported`))
+            .catch(err => signale.error(err));
     });
 
 program
