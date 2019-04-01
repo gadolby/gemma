@@ -70,7 +70,7 @@ program
         const cmd = util.collectOpts(util.last(args));
         const samples = await gemma.query.listSamples(cmd);
         if (samples.length) {
-            util.table('Samples', samples);
+            samples.forEach(s => process.stdout.write(s + '\n'));
         } else {
             process.stdout.write(chalk.red.bold('no samples found'));
         }
@@ -84,7 +84,7 @@ program
         const cmd = util.collectOpts(util.last(args));
         const chromosomes = await gemma.query.listChromosomes(cmd);
         if (chromosomes.length) {
-            util.table('Chromosomes', chromosomes);
+            chromosomes.forEach(c => process.stdout.write(c + '\n'));
         } else {
             process.stdout.write(chalk.red.bold('no chromosomes found'));
         }

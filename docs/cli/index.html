@@ -68,7 +68,7 @@ program
         <span class="hljs-keyword">const</span> cmd = util.collectOpts(util.last(args));
         <span class="hljs-keyword">const</span> samples = <span class="hljs-keyword">await</span> gemma.query.listSamples(cmd);
         <span class="hljs-keyword">if</span> (samples.length) {
-            util.table(<span class="hljs-string">'Samples'</span>, samples);
+            samples.forEach(s =&gt; process.stdout.write(s + <span class="hljs-string">'\n'</span>));
         } <span class="hljs-keyword">else</span> {
             process.stdout.write(chalk.red.bold(<span class="hljs-string">'no samples found'</span>));
         }
@@ -82,7 +82,7 @@ program
         <span class="hljs-keyword">const</span> cmd = util.collectOpts(util.last(args));
         <span class="hljs-keyword">const</span> chromosomes = <span class="hljs-keyword">await</span> gemma.query.listChromosomes(cmd);
         <span class="hljs-keyword">if</span> (chromosomes.length) {
-            util.table(<span class="hljs-string">'Chromosomes'</span>, chromosomes);
+            chromosomes.forEach(c =&gt; process.stdout.write(c + <span class="hljs-string">'\n'</span>));
         } <span class="hljs-keyword">else</span> {
             process.stdout.write(chalk.red.bold(<span class="hljs-string">'no chromosomes found'</span>));
         }
