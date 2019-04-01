@@ -82,7 +82,7 @@ program
     .description('List the distinct chromosomes')
     .action(async function(...args) {
         const cmd = util.collectOpts(util.last(args));
-        const chromosomes = gemma.query.listChromosomes(cmd);
+        const chromosomes = await gemma.query.listChromosomes(cmd);
         if (chromosomes.length) {
             util.table('Chromosomes', chromosomes);
         } else {
