@@ -51,11 +51,11 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "foldPrefix": "^",
               "name": "JavaScript"
             },
-            "sourcePath": "/home/dglmoore/gemma/cli/gemma.js",
-            "projectPath": "cli/gemma.js",
-            "targetPath": "cli/gemma",
-            "pageTitle": "cli/gemma",
-            "title": "gemma"
+            "sourcePath": "/home/dglmoore/gemma/cli/index.js",
+            "projectPath": "cli/index.js",
+            "targetPath": "cli/index",
+            "pageTitle": "cli/index",
+            "title": "index"
           },
           "depth": 2,
           "outline": []

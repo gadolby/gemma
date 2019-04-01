@@ -4,7 +4,7 @@
   "description": "Mapping genomic data and such",
   "main": "lib/index.js",
   "bin": {
-    "gemma": "cli/gemma.js"
+    "gemma": "cli/index.js"
   },
   "scripts": {
     "test": "jest",
