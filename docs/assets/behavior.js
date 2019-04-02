@@ -124,20 +124,160 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "cli/index.js",
             "targetPath": "cli/index",
             "pageTitle": "cli/index",
-            "firstHeader": {
+            "title": "index"
+          },
+          "depth": 2,
+          "outline": [
+            {
               "type": "heading",
               "data": {
                 "level": 1,
                 "title": "gemma",
-                "slug": "gemma",
-                "isFileHeader": true
+                "slug": "gemma"
               },
-              "depth": 1
-            },
-            "title": "gemma"
-          },
-          "depth": 2,
-          "outline": []
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Table of Contents",
+                    "slug": "table-of-contents"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Example Usage",
+                    "slug": "example-usage"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Global Options",
+                    "slug": "global-options"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Help",
+                        "slug": "help"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Version",
+                        "slug": "version"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Database Path",
+                        "slug": "database-path"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Silent Mode",
+                        "slug": "silent-mode"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "No Color",
+                        "slug": "no-color"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Import Subcommands",
+                    "slug": "import-subcommands"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Import VCF",
+                        "slug": "import-vcf"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Import GFF",
+                        "slug": "import-gff"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Import Environment",
+                        "slug": "import-environment"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Querying",
+                    "slug": "querying"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "List Samples",
+                        "slug": "list-samples"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "List Chromosomes",
+                        "slug": "list-chromosomes"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Epilog",
+                    "slug": "epilog"
+                  },
+                  "depth": 2
+                }
+              ]
+            }
+          ]
         }, {
           "type": "file",
           "data": {
