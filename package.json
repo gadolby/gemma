@@ -24,10 +24,12 @@
   },
   "files": [
     "**/*.js",
+    "!data/",
     "!test/",
-    "!docs/",
     "!coverage/",
-    "!scripts/"
+    "!scripts/",
+    "!**/*.db",
+    "!*.db"
   ],
   "homepage": "https://dglmoore.github.io/gemma",
   "jest": {
