@@ -89,7 +89,7 @@ program
     // λ gemma -v
     // 0.0.0
     // ```
-    .version('0.0.0', '-v, --version')
+    .version(util.version(), '-v, --version')
     // ### Database Path
     // By default, **Gemma**'s database will be constructed in the current
     // working directory and be named `gemma.db`. You can override this path
