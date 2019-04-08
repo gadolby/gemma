@@ -5,7 +5,7 @@ const { Database } = require('../lib/database');
 
 const assetsPath = path.join(__dirname, 'assets');
 const dbFile  = path.join(assetsPath, 'gemma-import.db');
-const gffFile = path.join(assetsPath, 'gff', 'sample.gff');
+const gffFile = path.join(assetsPath, 'gff', 'valid', 'sample.gff');
 const ecoFile = path.join(assetsPath, 'env', 'valid.csv');
 
 const fieldSorter = (a, b, f) => (a[f] < b[f]) ? -1 : (a[f] > b[f]) ? 1 : 0;
