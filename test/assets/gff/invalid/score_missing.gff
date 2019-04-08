@@ -1,0 +1,3 @@
+scaffold_1	maker	gene	2446	17292	.	+	.	ID=SPLAT;Name=SPLAT;Note=Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii);
+scaffold_1	maker	mRNA	2446	17292	.	+	.	ID=SPLAT-RA;Parent=SPLAT;Name=SPLAT-RA;Note=Similar to PLAT: Tissue-type plasminogen activator (Pongo abelii);
+scaffold_1	maker	exon	2446	2545		+	.	ID=SPLAT-RA:exon:4045;Parent=SPLAT-RA;

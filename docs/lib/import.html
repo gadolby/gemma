@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><title>lib/import</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/import"><meta name="groc-project-path" content="lib/import.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/lib/import.js">lib/import.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs-extra'</span>);
 <span class="hljs-keyword">const</span> jdb = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./database'</span>);
 <span class="hljs-keyword">const</span> VCF = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./vcf'</span>);
-<span class="hljs-keyword">const</span> gff = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bionode-gff'</span>);
+<span class="hljs-keyword">const</span> GFF = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./gff'</span>);
 <span class="hljs-keyword">const</span> csv = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csv'</span>);
 
 <span class="hljs-keyword">const</span> importVCF = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filename, cmd</span>) </span>{
@@ -42,21 +42,24 @@
     <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'genes'</span>);
     <span class="hljs-keyword">if</span> (empty) {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
-            <span class="hljs-keyword">const</span> g = gff.read(filename);
+            <span class="hljs-keyword">const</span> gff = GFF();
+            gff.read(filename);
 
             <span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>;
-            g.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+            gff.on(<span class="hljs-string">'data'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">entry</span>) </span>{
+                gff.pause();
                 n += <span class="hljs-number">1</span>;
                 <span class="hljs-keyword">try</span> {
                     <span class="hljs-keyword">await</span> db.insertGeneFeature(entry);
+                    gff.resume();
                 } <span class="hljs-keyword">catch</span>(err) {
-                    g.emit(<span class="hljs-string">'error'</span>, err);
+                    gff.emit(<span class="hljs-string">'error'</span>, err);
                 }
             });
 
-            g.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
+            gff.on(<span class="hljs-string">'error'</span>, (err) =&gt; reject(err));
 
-            g.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
+            gff.on(<span class="hljs-string">'end'</span>, () =&gt; resolve(n));
         }).finally(() =&gt; db.close());
     } <span class="hljs-keyword">else</span> {
         <span class="hljs-keyword">await</span> db.close();

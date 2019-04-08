@@ -17,7 +17,127 @@
         },
 
         data(line) {
-            <span class="hljs-keyword">return</span> line;
+            <span class="hljs-keyword">const</span> columns = line.split(<span class="hljs-string">'\t'</span>);
+            <span class="hljs-keyword">if</span> (columns.length &lt; <span class="hljs-number">9</span>) {
+                <span class="hljs-keyword">this</span>.fatal(<span class="hljs-string">`missing <span class="hljs-subst">${9 - columns.length}</span> columns`</span>, line);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (columns.length &gt; <span class="hljs-number">9</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`found <span class="hljs-subst">${columns.length - 9}</span> columns`</span>, line);
+            }
+            <span class="hljs-keyword">const</span> datum = {
+                seqid: <span class="hljs-keyword">this</span>.parseSeqID(columns[<span class="hljs-number">0</span>], line),
+                source: <span class="hljs-keyword">this</span>.parseSource(columns[<span class="hljs-number">1</span>], line),
+                type: <span class="hljs-keyword">this</span>.parseType(columns[<span class="hljs-number">2</span>], line),
+                start: <span class="hljs-keyword">this</span>.parseStart(columns[<span class="hljs-number">3</span>], line),
+                end: <span class="hljs-keyword">this</span>.parseEnd(columns[<span class="hljs-number">4</span>], line),
+                score: <span class="hljs-keyword">this</span>.parseScore(columns[<span class="hljs-number">5</span>], line),
+                strand: <span class="hljs-keyword">this</span>.parseStrand(columns[<span class="hljs-number">6</span>], line),
+                phase: <span class="hljs-keyword">this</span>.parsePhase(columns[<span class="hljs-number">7</span>], line)
+            };
+            <span class="hljs-keyword">const</span> attributes = {};
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> attribute <span class="hljs-keyword">of</span> columns[<span class="hljs-number">8</span>].split(<span class="hljs-string">';'</span>)) {
+                <span class="hljs-keyword">if</span> (attribute.length !== <span class="hljs-number">0</span>) {
+                    <span class="hljs-keyword">const</span> [tag, value] = <span class="hljs-keyword">this</span>.parseAttribute(attribute, line);
+                    <span class="hljs-keyword">if</span> (attributes[tag] !== <span class="hljs-literal">undefined</span>) {
+                        <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`duplicate attribute <span class="hljs-subst">${tag}</span>`</span>, line);
+                    }
+                    attributes[tag] = value;
+                }
+            }
+            datum[<span class="hljs-string">'attributes'</span>] = attributes;
+
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.validate(datum);
+        },
+
+        parseSeqID: (field) =&gt; field,
+
+        parseSource(field, line) {
+            <span class="hljs-keyword">if</span> (field.length === <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`source is missing`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> field;
+        },
+
+        parseType(field, line) {
+            <span class="hljs-keyword">if</span> (field.length === <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`type is missing`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> field;
+        },
+
+        parseStart(field, line) {
+            <span class="hljs-keyword">const</span> start = <span class="hljs-built_in">parseInt</span>(field);
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(start)) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`start value is not a number, got "<span class="hljs-subst">${field}</span>"`</span>, line);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (start &lt; <span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`start value is less than 1, got "<span class="hljs-subst">${start}</span>"`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> start;
+        },
+
+        parseEnd(field, line) {
+            <span class="hljs-keyword">const</span> end = <span class="hljs-built_in">parseInt</span>(field);
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(end)) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`end value is not a number, got "<span class="hljs-subst">${field}</span>"`</span>, line);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (end &lt; <span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`end value is less than 1, got "<span class="hljs-subst">${end}</span>"`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> end;
+        },
+
+        parseScore(field, line) {
+            <span class="hljs-keyword">const</span> score = (field === <span class="hljs-string">'.'</span>) ? field : <span class="hljs-built_in">parseInt</span>(field);
+            <span class="hljs-keyword">if</span> (score !== <span class="hljs-string">'.'</span> &amp;&amp; <span class="hljs-built_in">isNaN</span>(score)) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`score is not a number, got "<span class="hljs-subst">${field}</span>"`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> score;
+        },
+
+        parseStrand(field, line) {
+            <span class="hljs-keyword">switch</span>(field) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'+'</span>: <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'-'</span>: <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'.'</span>: <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'?'</span>: <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`strand should be "+", "-", "." or "?", got "<span class="hljs-subst">${field}</span>"`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> field;
+        },
+
+        parsePhase(field, line) {
+            <span class="hljs-keyword">const</span> phase = (field === <span class="hljs-string">'.'</span>) ? field : <span class="hljs-built_in">parseInt</span>(field);
+            <span class="hljs-keyword">if</span> (phase !== <span class="hljs-string">'.'</span>) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(phase)) {
+                    <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`phase is not a number, got "<span class="hljs-subst">${field}</span>"`</span>, line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (phase !== <span class="hljs-number">0</span> &amp;&amp; phase !== <span class="hljs-number">1</span> &amp;&amp; phase !== <span class="hljs-number">2</span>) {
+                    <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`phase should be 0, 1, 2 or '.', got "<span class="hljs-subst">${phase}</span>"`</span>, line);
+                }
+            }
+            <span class="hljs-keyword">return</span> phase;
+        },
+
+        parseAttribute(attribute, line) {
+            <span class="hljs-keyword">const</span> parts = attribute.split(<span class="hljs-string">'='</span>);
+            <span class="hljs-keyword">if</span> (parts.length !== <span class="hljs-number">2</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`attribute "<span class="hljs-subst">${attribute}</span>" is illformed; should be Tag=Value`</span>, line);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (parts[<span class="hljs-number">0</span>].length === <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">`attribute "<span class="hljs-subst">${attribute}</span>" is missing a name; should be Tag=Value`</span>, line);
+            }
+            <span class="hljs-keyword">return</span> parts;
+        },
+
+        validate(datum, line) {
+            <span class="hljs-keyword">if</span> (datum.end &lt; datum.start) {
+                <span class="hljs-keyword">const</span> msg = <span class="hljs-string">'feature\'s end is less than it\'s start: '</span>
+                    + <span class="hljs-string">`start=<span class="hljs-subst">${datum.start}</span>, end=<span class="hljs-subst">${datum.end}</span>`</span>;
+                <span class="hljs-keyword">this</span>.error(msg, line);
+            }
+
+            <span class="hljs-keyword">if</span> (datum.attributes.ID === <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">this</span>.error(<span class="hljs-string">'feature is missing the "ID" attribute'</span>, line);
+            }
+
+            <span class="hljs-keyword">return</span> datum;
         },
 
         fatal(msg, line) {
