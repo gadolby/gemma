@@ -145,7 +145,8 @@ describe('import gff', function() {
         const geneSorter = function(a, b) {
             const start = fieldSorter(a, b, 'Start');
             const end = -1 * fieldSorter(a, b, 'End');
-            return (start) ? start : end;
+            const p = (a.ID === b.ParentID) ? -1 : (b.ID === a.ParentID) ? 1 : 0;
+            return (start) ? start : (end) ? end : p;
         };
 
         const n = await gff(gffFile, { database: dbFile });
