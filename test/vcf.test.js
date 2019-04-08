@@ -1,8 +1,13 @@
 const fs = require('fs-extra');
 const path = require('path');
+const VCF = require('../lib/vcf');
+
+const vcfPath = path.join(__dirname, 'assets', 'vcf');
+const invalidVCFPath = path.join(vcfPath, 'invalid');
+const validVCFPath = path.join(vcfPath, 'valid');
 
 describe('throws for invalid vcf', function() {
-    const invalid_files = [
+    const invalidVCFs = [
         ['duplicate_column.vcf', 1],
         ['duplicate_header.vcf', 1],
         ['duplicate_sample.vcf', 1],
@@ -23,13 +28,13 @@ describe('throws for invalid vcf', function() {
         ['too_few_samples_2.vcf', 1],
         ['too_many_samples.vcf', 1],
     ];
-    test.each(invalid_files)('.from file "%s"', async function(filename, numErrors) {
-        const filepath = path.join(__dirname, 'assets', 'vcf', 'invalid', filename);
+    test.each(invalidVCFs)('.from file "%s"', async function(filename, numErrors) {
+        const filepath = path.join(invalidVCFPath, filename);
         expect(fs.existsSync(filepath)).toBeTruthy();
 
         const mockError = jest.fn(x => x);
 
-        const vcf = require('../lib/vcf')();
+        const vcf = VCF();
         expect(vcf.parser).toBeUndefined();
 
         return await new Promise(function(resolve) {
@@ -41,13 +46,13 @@ describe('throws for invalid vcf', function() {
         });
     });
 
-    test.each(invalid_files)('.from stream of file "%s"', async function(filename, numErrors) {
-        const filepath = path.join(__dirname, 'assets', 'vcf', 'invalid', filename);
+    test.each(invalidVCFs)('.from stream of file "%s"', async function(filename, numErrors) {
+        const filepath = path.join(invalidVCFPath, filename);
         expect(fs.existsSync(filepath)).toBeTruthy();
 
         const mockError = jest.fn(x => x);
 
-        const vcf = require('../lib/vcf')();
+        const vcf = VCF();
         expect(vcf.parser).toBeUndefined();
 
         return await new Promise(function(resolve) {
@@ -62,17 +67,14 @@ describe('throws for invalid vcf', function() {
 });
 
 describe('parse without error', function() {
-    test.each([
-        'no_genotypes.vcf',
-        'no_samples.vcf',
-        'only_mandatory.vcf'
-    ])('.from file "%s"', async function(filename) {
-        const filepath = path.join(__dirname, 'assets', 'vcf', 'valid', filename);
+    const validVCFs = fs.readdirSync(validVCFPath);
+    test.each(validVCFs)('.from file "%s"', async function(filename) {
+        const filepath = path.join(validVCFPath, filename);
         expect(fs.existsSync(filepath)).toBeTruthy();
 
         const mockError = jest.fn(x => x);
 
-        const vcf = require('../lib/vcf')();
+        const vcf = VCF();
         expect(vcf.parser).toBeUndefined();
 
         return await new Promise(function(resolve) {
@@ -85,17 +87,13 @@ describe('parse without error', function() {
         });
     });
 
-    test.each([
-        'no_genotypes.vcf',
-        'no_samples.vcf',
-        'only_mandatory.vcf'
-    ])('.from stream of file "%s"', async function(filename) {
-        const filepath = path.join(__dirname, 'assets', 'vcf', 'valid', filename);
+    test.each(validVCFs)('.from stream of file "%s"', async function(filename) {
+        const filepath = path.join(validVCFPath, filename);
         expect(fs.existsSync(filepath)).toBeTruthy();
 
         const mockError = jest.fn(x => x);
 
-        const vcf = require('../lib/vcf')();
+        const vcf = VCF();
         expect(vcf.parser).toBeUndefined();
 
         return await new Promise(function(resolve) {
