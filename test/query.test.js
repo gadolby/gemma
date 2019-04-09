@@ -11,7 +11,7 @@ const vcfFile = path.join(assetsPath, 'vcf', 'valid', 'sample.vcf');
 
 beforeEach(async function() {
     await expect(imp.vcf(vcfFile, { database: dbFile })).resolves.toBe(3);
-    return expect(jdb.Database(dbFile).then(db => db.close())).resolves;
+    return expect(jdb.Database(dbFile).then(db => db.close())).resolves.toBeUndefined();
 });
 
 afterEach(function() {
