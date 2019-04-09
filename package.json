@@ -7,7 +7,7 @@
     "gemma": "cli/index.js"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "lint": "eslint cli lib test"
   },
   "repository": {
