@@ -40,7 +40,7 @@
     <span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> jdb.Database(cmd.database);
 
     <span class="hljs-keyword">const</span> empty = <span class="hljs-keyword">await</span> db.isEmpty(<span class="hljs-string">'genes'</span>);
-    <span class="hljs-keyword">if</span> (empty) {
+    <span class="hljs-keyword">if</span> (empty || cmd.append) {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resolve, reject</span>) </span>{
             <span class="hljs-keyword">const</span> gff = GFF();
             gff.read(filename);

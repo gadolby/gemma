@@ -1,0 +1,3 @@
+scaffold_1	maker	gene	20000	30000	.	+	.	ID=Gene;Name=Gene;Note=Similar to Something
+scaffold_1	maker	mRNA	20000	30000	.	+	.	ID=Gene-RA;Parent=Gene;Name=Gene-RA;Note=Similar to Something
+scaffold_1	maker	exon	25000	28000	.	+	.	ID=Gene-RA:exon;Parent=Gene-RA;

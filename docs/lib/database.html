@@ -14,7 +14,7 @@
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS alternates (AlternateID int, Chromosome string, Position int, Alternate string, SNP int, PRIMARY KEY (AlternateID, Chromosome, Position))'</span>),
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS variants (SampleID string, Chromosome string, Position int, ChromosomeCopy int, AlternateID int, PRIMARY KEY (SampleID, Chromosome, Position, ChromosomeCopy))'</span>),
         db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS environment (SampleID string, Name string, Value string, PRIMARY KEY (SampleID, Name))'</span>),
-        db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS genes (ParentID string, ID string, Source string, Type string, Start int, End int, Note string)'</span>)
+        db.run(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS genes (ParentID string, ID string UNIQUE, Source string, Type string, Start int, End int, Note string)'</span>)
     ]);
 
     <span class="hljs-keyword">const</span> close = () =&gt; db.close();
