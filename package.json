@@ -42,7 +42,6 @@
     "jest": "^24.5.0"
   },
   "dependencies": {
-    "bionode-gff": "^2.0.0",
     "commander": "^2.18.0",
     "csv": "^3.1.0",
     "fs-extra": "^7.0.1",
