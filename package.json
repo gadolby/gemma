@@ -39,10 +39,10 @@
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-plugin-jest": "^22.4.1",
-    "jest": "^24.5.0"
+    "jest": "^24.7.1"
   },
   "dependencies": {
-    "commander": "^2.18.0",
+    "commander": "^2.20.0",
     "csv": "^3.1.0",
     "fs-extra": "^7.0.1",
     "signale": "^1.4.0",
