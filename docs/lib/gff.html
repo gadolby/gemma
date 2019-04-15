@@ -5,17 +5,24 @@
 <span class="hljs-keyword">const</span> Parser = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filepath</span>) </span>{
     <span class="hljs-keyword">let</span> lineNumber = <span class="hljs-number">0</span>;
 
+    <span class="hljs-keyword">let</span> foundFASTA = <span class="hljs-literal">false</span>;
     <span class="hljs-keyword">let</span> errorState = <span class="hljs-literal">false</span>;
 
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.create({
         version: {},
+        metadata: {},
 
         line(line) {
             lineNumber += <span class="hljs-number">1</span>;
             line = line.trim();
-            <span class="hljs-keyword">if</span> (line.length !== <span class="hljs-number">0</span> &amp;&amp; !errorState) {
+            <span class="hljs-keyword">if</span> (line.length !== <span class="hljs-number">0</span> &amp;&amp; !foundFASTA &amp;&amp; !errorState) {
                 <span class="hljs-keyword">if</span> (lineNumber === <span class="hljs-number">1</span>) {
                     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.fileFormat(line);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (line === <span class="hljs-string">'##FASTA'</span>) {
+                    foundFASTA = <span class="hljs-literal">true</span>;
+                    <span class="hljs-keyword">return</span>;
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (line[<span class="hljs-number">0</span>] === <span class="hljs-string">'#'</span>) {
+                    <span class="hljs-keyword">return</span>;
                 } <span class="hljs-keyword">else</span> {
                     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data(line);
                 }
