@@ -400,6 +400,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "foldPrefix": "^",
               "name": "JavaScript"
             },
+            "sourcePath": "/home/dglmoore/gemma/lib/parserapi.js",
+            "projectPath": "lib/parserapi.js",
+            "targetPath": "lib/parserapi",
+            "pageTitle": "lib/parserapi",
+            "title": "parserapi"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
             "sourcePath": "/home/dglmoore/gemma/lib/query.js",
             "projectPath": "lib/query.js",
             "targetPath": "lib/query",
