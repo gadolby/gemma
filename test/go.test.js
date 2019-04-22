@@ -38,3 +38,112 @@ describe('search', function() {
         });
     });
 });
+
+describe('term', function() {
+    test('.throws without query', async function() {
+        await expect(go.term()).rejects.toThrow(/no GO term ID provided/);
+        await expect(go.term({})).rejects.toThrow(/illformed GO term ID/);
+    });
+
+    test('.can find term of form "GO:\\d{7}"', function() {
+        return expect(go.term('GO:0036026')).resolves.toEqual({
+            'numberOfHits': 1,
+            'results': [
+                {
+                    'id': 'GO:0036026',
+                    'isObsolete': false,
+                    'name': 'protein C inhibitor-PLAT complex',
+                    'definition': {
+                        'text': 'A heterodimeric protein complex that contains protein C inhibitor (SERPINA5) and tissue-type plasminogen activator (PLAT); formation of the complex inhibits the serine protease activity of tissue-type plasminogen activator.',
+                        'xrefs': [
+                            {
+                                'dbCode': 'PMID',
+                                'dbId': '10340997'
+                            }
+                        ]
+                    },
+                    'synonyms': [
+                        {
+                            'name': 'protein C inhibitor-tPA complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'plasma serine protease inhibitor-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'serpin A5-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'SERPINA5-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'PCI-PLAT complex',
+                            'type': 'exact'
+                        }
+                    ],
+                    'aspect': 'cellular_component',
+                    'usage': 'Unrestricted'
+                }
+            ],
+            'pageInfo': null
+        });
+    });
+
+    test('.can find term of form "\\d{7}"', function() {
+        return expect(go.term('0036026')).resolves.toEqual({
+            'numberOfHits': 1,
+            'results': [
+                {
+                    'id': 'GO:0036026',
+                    'isObsolete': false,
+                    'name': 'protein C inhibitor-PLAT complex',
+                    'definition': {
+                        'text': 'A heterodimeric protein complex that contains protein C inhibitor (SERPINA5) and tissue-type plasminogen activator (PLAT); formation of the complex inhibits the serine protease activity of tissue-type plasminogen activator.',
+                        'xrefs': [
+                            {
+                                'dbCode': 'PMID',
+                                'dbId': '10340997'
+                            }
+                        ]
+                    },
+                    'synonyms': [
+                        {
+                            'name': 'protein C inhibitor-tPA complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'plasma serine protease inhibitor-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'serpin A5-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'SERPINA5-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {    
+                            'name': 'PCI-PLAT complex',
+                            'type': 'exact'
+                        }
+                    ],
+                    'aspect': 'cellular_component',
+                    'usage': 'Unrestricted'
+                }
+            ],
+            'pageInfo': null
+        });
+    });
+});
