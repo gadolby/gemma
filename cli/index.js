@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 // # gemma
 //
 // The `gemma` command line interface provides a (hopefully) simple way for you
@@ -10,6 +11,7 @@
 // * [Global Options](#global-options)
 // * [Import Subcommands](#import-subcommands)
 // * [Querying](#querying)
+// * [GO Search](#go-search)
 // * [Epilog](#epilog)
 
 // ## Example Usage
@@ -314,8 +316,95 @@ program
         if (chromosomes.length) {
             chromosomes.forEach(c => process.stdout.write(c + '\n'));
         } else {
-            process.stdout.write(chalk.red.bold('no chromosomes found'));
+            process.stdout.write(chalk.red.bold('no chromosomes found\n'));
         }
+    });
+
+// ## Searching QuickGo
+//
+// You can search the European Bioinformatics Institute's QuickGO database using **Gemma**'s command line interface. This is useful when you don't quite know what you're looking for yet. We provide, at the moment, two search methods:
+// * [go-term](#go-term)
+// * [go-search](#go-search)
+
+// ### GO Term
+//
+// This searches the QuickGo database for entries with a specific GO
+// term ID and prints the result to the screen.
+//
+// ```shell
+// λ gemma go-term GO:0036026
+// ┌─────────┬──────────────┬────────────────────────────────────┬──────────┬──────────────────────┐
+// │ (index) │      id      │                name                │ synonyms │        aspect        │
+// ├─────────┼──────────────┼────────────────────────────────────┼──────────┼──────────────────────┤
+// │    0    │ 'GO:0036026' │ 'protein C inhibitor-PLAT complex' │    6     │ 'cellular_component' │
+// └─────────┴──────────────┴────────────────────────────────────┴──────────┴──────────────────────┘
+// ```
+program
+    .command('go-term <goterm>')
+    .description('Search the EBI gene ontology database for a specific GO term')
+    .action(async function(goterm, cmd) {
+        gemma.query.goTerm(goterm, cmd)
+            .then(function(results) {
+                if (results.length) {
+                    results.forEach((result) => result.synonyms = result.synonyms.length);
+                    console.table(results);
+                } else {
+                    const msg = `no results found for GO term ${goterm}\n`;
+                    process.stdout.write(chalk.red.bold(msg));
+                }
+            }).catch(err => signale.error(err.message));
+    });
+
+// ### GO Search
+//
+// This searches the QuickGo database for generic entries. You can provide
+// any kind of query you like. For example, you can search for _PLAT_:
+//
+// ```shell
+// λ gemma go-search PLAT
+// ┌─────────┬──────────────┬───────────────────────────────────────────────────┬──────────────────────┐
+// │ (index) │      id      │                       name                        │        aspect        │
+// ├─────────┼──────────────┼───────────────────────────────────────────────────┼──────────────────────┤
+// │    0    │ 'GO:0036026' │        'protein C inhibitor-PLAT complex'         │ 'cellular_component' │
+// │    1    │ 'GO:0030168' │               'platelet activation'               │ 'biological_process' │
+// │    2    │ 'GO:0070527' │              'platelet aggregation'               │ 'biological_process' │
+// │    3    │ 'GO:0030220' │               'platelet formation'                │ 'biological_process' │
+// │    4    │ 'GO:0002576' │             'platelet degranulation'              │ 'biological_process' │
+// │    5    │ 'GO:0070090' │                 'metaphase plate'                 │ 'cellular_component' │
+// │    6    │ 'GO:1990073' │                'perforation plate'                │ 'cellular_component' │
+// │    7    │ 'GO:0097218' │                   'sieve plate'                   │ 'cellular_component' │
+// │    8    │ 'GO:0036344' │             'platelet morphogenesis'              │ 'biological_process' │
+// │    9    │ 'GO:0036345' │               'platelet maturation'               │ 'biological_process' │
+// │   10    │ 'GO:0009504' │                   'cell plate'                    │ 'cellular_component' │
+// │   11    │ 'GO:0032437' │                 'cuticular plate'                 │ 'cellular_component' │
+// │   12    │ 'GO:0003142' │         'cardiogenic plate morphogenesis'         │ 'biological_process' │
+// │   13    │ 'GO:0042827' │             'platelet dense granule'              │ 'cellular_component' │
+// │   14    │ 'GO:0021999' │ 'neural plate anterior/posterior regionalization' │ 'biological_process' │
+// │   15    │ 'GO:0021997' │         'neural plate axis specification'         │ 'biological_process' │
+// │   16    │ 'GO:0021998' │    'neural plate mediolateral regionalization'    │ 'biological_process' │
+// │   17    │ 'GO:0021991' │             'neural plate thickening'             │ 'biological_process' │
+// │   18    │ 'GO:0021990' │             'neural plate formation'              │ 'biological_process' │
+// │   19    │ 'GO:1990265' │     'platelet-derived growth factor complex'      │ 'cellular_component' │
+// │   20    │ 'GO:0070889' │       'platelet alpha granule organization'       │ 'biological_process' │
+// │   21    │ 'GO:0033505' │            'floor plate morphogenesis'            │ 'biological_process' │
+// │   22    │ 'GO:0033504' │             'floor plate development'             │ 'biological_process' │
+// │   23    │ 'GO:0070560' │          'protein secretion by platelet'          │ 'biological_process' │
+// │   24    │ 'GO:0070541' │            'response to platinum ion'             │ 'biological_process' │
+// └─────────┴──────────────┴───────────────────────────────────────────────────┴──────────────────────┘
+// ```
+program
+    .command('go-search <query>')
+    .description('Search the EBI gene ontology database for a general query')
+    .action(async function(query, cmd) {
+        gemma.query.goSearch(query, cmd)
+            .then(function(results) {
+                if (results.length) {
+                    console.table(results);
+                } else {
+                    const msg = `no results found for query ${query}\n`;
+                    process.stdout.write(chalk.red.bold(msg));
+                }
+            }).catch(err => signale.error(err.message));
     });
 
 // ## Epilog

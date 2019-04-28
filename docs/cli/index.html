@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><title>cli/index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="cli/index"><meta name="groc-project-path" content="cli/index.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/cli/index.js">cli/index.js</a></div></div><div id="document"><div class="segment"></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="gemma">gemma</h1>
+<!DOCTYPE html><html lang="en"><head><title>cli/index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="cli/index"><meta name="groc-project-path" content="cli/index.js"><meta name="groc-github-url" content="https://github.com/dglmoore/gemma"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/gemma/blob/master/cli/index.js">cli/index.js</a></div></div><div id="document"><div class="segment"></div><div class="segment"><div class="comments "><div class="wrapper"><p>eslint-disable no-console </p>
+<h1 id="gemma">gemma</h1>
 <p>The <code>gemma</code> command line interface provides a (hopefully) simple way for you
 to build and interact with a <strong>Gemma</strong> database.</p>
 <h2 id="table-of-contents">Table of Contents</h2>
@@ -7,6 +8,7 @@ to build and interact with a <strong>Gemma</strong> database.</p>
 <li><a href="#global-options">Global Options</a></li>
 <li><a href="#import-subcommands">Import Subcommands</a></li>
 <li><a href="#querying">Querying</a></li>
+<li><a href="#go-search">GO Search</a></li>
 <li><a href="#epilog">Epilog</a></li>
 </ul></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="example-usage">Example Usage</h2>
 <pre><code class="lang-shell">λ gemma import-vcf ./data/example.vcf
@@ -221,8 +223,80 @@ ScCC6lQ_1;HRSCAF_16</code></pre></div></div><div class="code"><div class="wrappe
         <span class="hljs-keyword">if</span> (chromosomes.length) {
             chromosomes.forEach(c =&gt; process.stdout.write(c + <span class="hljs-string">'\n'</span>));
         } <span class="hljs-keyword">else</span> {
-            process.stdout.write(chalk.red.bold(<span class="hljs-string">'no chromosomes found'</span>));
+            process.stdout.write(chalk.red.bold(<span class="hljs-string">'no chromosomes found\n'</span>));
         }
+    });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="searching-quickgo">Searching QuickGo</h2>
+<p>You can search the European Bioinformatics Institute&#39;s QuickGO database using <strong>Gemma</strong>&#39;s command line interface. This is useful when you don&#39;t quite know what you&#39;re looking for yet. We provide, at the moment, two search methods:</p>
+<ul>
+<li><a href="#go-term">go-term</a></li>
+<li><a href="#go-search">go-search</a></li>
+</ul></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h3 id="go-term">GO Term</h3>
+<p>This searches the QuickGo database for entries with a specific GO
+term ID and prints the result to the screen.</p>
+<pre><code class="lang-shell">λ gemma go-term GO:0036026
+┌─────────┬──────────────┬────────────────────────────────────┬──────────┬──────────────────────┐
+│ (index) │      id      │                name                │ synonyms │        aspect        │
+├─────────┼──────────────┼────────────────────────────────────┼──────────┼──────────────────────┤
+│    0    │ &#39;GO:0036026&#39; │ &#39;protein C inhibitor-PLAT complex&#39; │    6     │ &#39;cellular_component&#39; │
+└─────────┴──────────────┴────────────────────────────────────┴──────────┴──────────────────────┘</code></pre></div></div><div class="code"><div class="wrapper">program
+    .command(<span class="hljs-string">'go-term &lt;goterm&gt;'</span>)
+    .description(<span class="hljs-string">'Search the EBI gene ontology database for a specific GO term'</span>)
+    .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">goterm, cmd</span>) </span>{
+        gemma.query.goTerm(goterm, cmd)
+            .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">results</span>) </span>{
+                <span class="hljs-keyword">if</span> (results.length) {
+                    results.forEach((result) =&gt; result.synonyms = result.synonyms.length);
+                    <span class="hljs-built_in">console</span>.table(results);
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`no results found for GO term <span class="hljs-subst">${goterm}</span>\n`</span>;
+                    process.stdout.write(chalk.red.bold(msg));
+                }
+            }).catch(err =&gt; signale.error(err.message));
+    });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h3 id="go-search">GO Search</h3>
+<p>This searches the QuickGo database for generic entries. You can provide
+any kind of query you like. For example, you can search for <em>PLAT</em>:</p>
+<pre><code class="lang-shell">λ gemma go-search PLAT
+┌─────────┬──────────────┬───────────────────────────────────────────────────┬──────────────────────┐
+│ (index) │      id      │                       name                        │        aspect        │
+├─────────┼──────────────┼───────────────────────────────────────────────────┼──────────────────────┤
+│    0    │ &#39;GO:0036026&#39; │        &#39;protein C inhibitor-PLAT complex&#39;         │ &#39;cellular_component&#39; │
+│    1    │ &#39;GO:0030168&#39; │               &#39;platelet activation&#39;               │ &#39;biological_process&#39; │
+│    2    │ &#39;GO:0070527&#39; │              &#39;platelet aggregation&#39;               │ &#39;biological_process&#39; │
+│    3    │ &#39;GO:0030220&#39; │               &#39;platelet formation&#39;                │ &#39;biological_process&#39; │
+│    4    │ &#39;GO:0002576&#39; │             &#39;platelet degranulation&#39;              │ &#39;biological_process&#39; │
+│    5    │ &#39;GO:0070090&#39; │                 &#39;metaphase plate&#39;                 │ &#39;cellular_component&#39; │
+│    6    │ &#39;GO:1990073&#39; │                &#39;perforation plate&#39;                │ &#39;cellular_component&#39; │
+│    7    │ &#39;GO:0097218&#39; │                   &#39;sieve plate&#39;                   │ &#39;cellular_component&#39; │
+│    8    │ &#39;GO:0036344&#39; │             &#39;platelet morphogenesis&#39;              │ &#39;biological_process&#39; │
+│    9    │ &#39;GO:0036345&#39; │               &#39;platelet maturation&#39;               │ &#39;biological_process&#39; │
+│   10    │ &#39;GO:0009504&#39; │                   &#39;cell plate&#39;                    │ &#39;cellular_component&#39; │
+│   11    │ &#39;GO:0032437&#39; │                 &#39;cuticular plate&#39;                 │ &#39;cellular_component&#39; │
+│   12    │ &#39;GO:0003142&#39; │         &#39;cardiogenic plate morphogenesis&#39;         │ &#39;biological_process&#39; │
+│   13    │ &#39;GO:0042827&#39; │             &#39;platelet dense granule&#39;              │ &#39;cellular_component&#39; │
+│   14    │ &#39;GO:0021999&#39; │ &#39;neural plate anterior/posterior regionalization&#39; │ &#39;biological_process&#39; │
+│   15    │ &#39;GO:0021997&#39; │         &#39;neural plate axis specification&#39;         │ &#39;biological_process&#39; │
+│   16    │ &#39;GO:0021998&#39; │    &#39;neural plate mediolateral regionalization&#39;    │ &#39;biological_process&#39; │
+│   17    │ &#39;GO:0021991&#39; │             &#39;neural plate thickening&#39;             │ &#39;biological_process&#39; │
+│   18    │ &#39;GO:0021990&#39; │             &#39;neural plate formation&#39;              │ &#39;biological_process&#39; │
+│   19    │ &#39;GO:1990265&#39; │     &#39;platelet-derived growth factor complex&#39;      │ &#39;cellular_component&#39; │
+│   20    │ &#39;GO:0070889&#39; │       &#39;platelet alpha granule organization&#39;       │ &#39;biological_process&#39; │
+│   21    │ &#39;GO:0033505&#39; │            &#39;floor plate morphogenesis&#39;            │ &#39;biological_process&#39; │
+│   22    │ &#39;GO:0033504&#39; │             &#39;floor plate development&#39;             │ &#39;biological_process&#39; │
+│   23    │ &#39;GO:0070560&#39; │          &#39;protein secretion by platelet&#39;          │ &#39;biological_process&#39; │
+│   24    │ &#39;GO:0070541&#39; │            &#39;response to platinum ion&#39;             │ &#39;biological_process&#39; │
+└─────────┴──────────────┴───────────────────────────────────────────────────┴──────────────────────┘</code></pre></div></div><div class="code"><div class="wrapper">program
+    .command(<span class="hljs-string">'go-search &lt;query&gt;'</span>)
+    .description(<span class="hljs-string">'Search the EBI gene ontology database for a general query'</span>)
+    .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">query, cmd</span>) </span>{
+        gemma.query.goSearch(query, cmd)
+            .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">results</span>) </span>{
+                <span class="hljs-keyword">if</span> (results.length) {
+                    <span class="hljs-built_in">console</span>.table(results);
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`no results found for query <span class="hljs-subst">${query}</span>\n`</span>;
+                    process.stdout.write(chalk.red.bold(msg));
+                }
+            }).catch(err =&gt; signale.error(err.message));
     });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="epilog">Epilog</h2></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If you provide an unrecognized subcommand, we print the <a href="#help">help information</a>.</p></div></div><div class="code"><div class="wrapper">program.on(<span class="hljs-string">'command:*'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     process.stdout.write(program.helpInformation() + <span class="hljs-string">'\n'</span>);
     process.exit(<span class="hljs-number">1</span>);
