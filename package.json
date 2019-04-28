@@ -1,6 +1,6 @@
 {
   "name": "@dglmoore/gemma",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Mapping genomic data and such",
   "main": "lib/index.js",
   "bin": {
