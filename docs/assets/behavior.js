@@ -360,6 +360,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "foldPrefix": "^",
               "name": "JavaScript"
             },
+            "sourcePath": "/home/dglmoore/gemma/lib/go.js",
+            "projectPath": "lib/go.js",
+            "targetPath": "lib/go",
+            "pageTitle": "lib/go",
+            "title": "go"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
             "sourcePath": "/home/dglmoore/gemma/lib/import.js",
             "projectPath": "lib/import.js",
             "targetPath": "lib/import",
