@@ -45,8 +45,8 @@ describe('term', function() {
         await expect(go.term({})).rejects.toThrow(/illformed GO term ID/);
     });
 
-    test('.can find term of form "GO:\\d{7}"', function() {
-        return expect(go.term('GO:0036026')).resolves.toEqual({
+    test('.can find term of form "GO:\\d{7}"', async function() {
+        const expected = {
             'numberOfHits': 1,
             'results': [
                 {
@@ -64,27 +64,27 @@ describe('term', function() {
                     },
                     'synonyms': [
                         {
-                            'name': 'protein C inhibitor-tPA complex',
+                            'name': 'PCI-PLAT complex',
                             'type': 'exact'
                         },
-                        {    
-                            'name': 'plasma serine protease inhibitor-PLAT complex',
-                            'type': 'exact'
-                        },
-                        {    
-                            'name': 'serpin A5-PLAT complex',
-                            'type': 'exact'
-                        },
-                        {    
-                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
-                            'type': 'exact'
-                        },
-                        {    
+                        {
                             'name': 'SERPINA5-PLAT complex',
                             'type': 'exact'
                         },
-                        {    
-                            'name': 'PCI-PLAT complex',
+                        {
+                            'name': 'plasma serine protease inhibitor-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'protein C inhibitor-tPA complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'serpin A5-PLAT complex',
                             'type': 'exact'
                         }
                     ],
@@ -93,11 +93,16 @@ describe('term', function() {
                 }
             ],
             'pageInfo': null
-        });
+        };
+        const got = await go.term('GO:0036026');
+        got.results.map(result => result.synonyms.sort((a,b) => {
+            return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
+        }));
+        return expect(got).toEqual(expected);
     });
 
-    test('.can find term of form "\\d{7}"', function() {
-        return expect(go.term('0036026')).resolves.toEqual({
+    test('.can find term of form "\\d{7}"', async function() {
+        const expected = {
             'numberOfHits': 1,
             'results': [
                 {
@@ -115,27 +120,27 @@ describe('term', function() {
                     },
                     'synonyms': [
                         {
-                            'name': 'protein C inhibitor-tPA complex',
+                            'name': 'PCI-PLAT complex',
                             'type': 'exact'
                         },
-                        {    
-                            'name': 'plasma serine protease inhibitor-PLAT complex',
-                            'type': 'exact'
-                        },
-                        {    
-                            'name': 'serpin A5-PLAT complex',
-                            'type': 'exact'
-                        },
-                        {    
-                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
-                            'type': 'exact'
-                        },
-                        {    
+                        {
                             'name': 'SERPINA5-PLAT complex',
                             'type': 'exact'
                         },
-                        {    
-                            'name': 'PCI-PLAT complex',
+                        {
+                            'name': 'plasma serine protease inhibitor-PLAT complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'protein C inhibitor-tPA complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'protein C inhibitor-tissue-type plasminogen activator complex',
+                            'type': 'exact'
+                        },
+                        {
+                            'name': 'serpin A5-PLAT complex',
                             'type': 'exact'
                         }
                     ],
@@ -144,6 +149,11 @@ describe('term', function() {
                 }
             ],
             'pageInfo': null
-        });
+        };
+        const got = await go.term('0036026');
+        got.results.map(result => result.synonyms.sort((a,b) => {
+            return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
+        }));
+        return expect(got).toEqual(expected);
     });
 });
