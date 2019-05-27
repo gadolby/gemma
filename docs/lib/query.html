@@ -38,4 +38,35 @@
         }));
 };
 
-<span class="hljs-built_in">module</span>.exports = { listChromosomes, listSamples, goSearch, goTerm };</div></div></div></div></body></html>
+<span class="hljs-keyword">const</span> getProteinName = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">{recommendedName, submittedName, alternativeName}</span>) </span>{
+    <span class="hljs-keyword">if</span> (recommendedName) {
+        <span class="hljs-keyword">return</span> recommendedName.fullName.value;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (submittedName) {
+        <span class="hljs-keyword">return</span> submittedName[<span class="hljs-number">0</span>].fullName.value;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (alternativeName) {
+        <span class="hljs-keyword">return</span> alternativeName[<span class="hljs-number">0</span>].fullName.value;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+};
+
+<span class="hljs-keyword">const</span> getGeneName = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">{name, orfNames}</span>) </span>{
+    <span class="hljs-keyword">if</span> (name) {
+        <span class="hljs-keyword">return</span> name.value;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (orfNames) {
+        <span class="hljs-keyword">return</span> orfNames.map(name =&gt; name.value);
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+};
+
+<span class="hljs-keyword">const</span> goProteins = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">goterm</span>) </span>{
+    <span class="hljs-keyword">return</span> go.proteins(goterm)
+        .then(data =&gt; data.map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">result</span>) </span>{
+            <span class="hljs-keyword">return</span> {
+                id: result.id,
+                protein: (result.protein) ? getProteinName(result.protein) : <span class="hljs-literal">undefined</span>,
+                genes: (result.gene) ? [].concat(...result.gene.map(getGeneName)) : <span class="hljs-literal">undefined</span>
+            };
+        }));
+};
+
+<span class="hljs-built_in">module</span>.exports = { listChromosomes, listSamples, goSearch, goTerm, goProteins };</div></div></div></div></body></html>

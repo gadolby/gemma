@@ -56,4 +56,14 @@
     <span class="hljs-keyword">return</span> getRequest(EBIHOST, path + <span class="hljs-string">'/'</span> + termid);
 };
 
-<span class="hljs-built_in">module</span>.exports = { search, term };</div></div></div></div></body></html>
+<span class="hljs-keyword">const</span> proteins = <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">termid</span>) </span>{
+    <span class="hljs-keyword">const</span> path = <span class="hljs-string">'/proteins/api/proteins'</span>;
+    <span class="hljs-keyword">const</span> terms = <span class="hljs-keyword">await</span> term(termid);
+    <span class="hljs-keyword">const</span> { name } = terms.results[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">if</span> (name === <span class="hljs-literal">undefined</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`no GO term with id <span class="hljs-subst">${termid}</span> was found`</span>);
+    }
+    <span class="hljs-keyword">return</span> getRequest(EBIHOST, path + <span class="hljs-string">'?'</span> + querystring.stringify({ goterms: name }));
+};
+
+<span class="hljs-built_in">module</span>.exports = { search, term, proteins };</div></div></div></div></body></html>

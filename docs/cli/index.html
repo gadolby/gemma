@@ -8,7 +8,7 @@ to build and interact with a <strong>Gemma</strong> database.</p>
 <li><a href="#global-options">Global Options</a></li>
 <li><a href="#import-subcommands">Import Subcommands</a></li>
 <li><a href="#querying">Querying</a></li>
-<li><a href="#go-search">GO Search</a></li>
+<li><a href="#searching-quickgo">Searching QuickGO</a></li>
 <li><a href="#epilog">Epilog</a></li>
 </ul></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="example-usage">Example Usage</h2>
 <pre><code class="lang-shell">λ gemma import-vcf ./data/example.vcf
@@ -230,6 +230,7 @@ ScCC6lQ_1;HRSCAF_16</code></pre></div></div><div class="code"><div class="wrappe
 <ul>
 <li><a href="#go-term">go-term</a></li>
 <li><a href="#go-search">go-search</a></li>
+<li><a href="#go-proteins">go-proteins</a></li>
 </ul></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h3 id="go-term">GO Term</h3>
 <p>This searches the QuickGo database for entries with a specific GO
 term ID and prints the result to the screen.</p>
@@ -294,6 +295,67 @@ any kind of query you like. For example, you can search for <em>PLAT</em>:</p>
                     <span class="hljs-built_in">console</span>.table(results);
                 } <span class="hljs-keyword">else</span> {
                     <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`no results found for query <span class="hljs-subst">${query}</span>\n`</span>;
+                    process.stdout.write(chalk.red.bold(msg));
+                }
+            }).catch(err =&gt; signale.error(err.message));
+    });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h3 id="go-proteins">GO Proteins</h3>
+<p>This searches the EBI proteins database for proteins matching a GO term.
+For example, you can search for proteins associated with the &quot;Protein C
+inhibitor-PLAT complex&quot; (GO:0036026)</p>
+<pre><code class="lang-shell">λ gemma go-proteins GO:0036026
+┌─────────┬────────────────────┬───────────────────────────────────────────────────────────────┬──────────────────┐
+│ (index) │         id         │                            protein                            │      genes       │
+├─────────┼────────────────────┼───────────────────────────────────────────────────────────────┼──────────────────┤
+│    0    │ &#39;A0A091CUK9_FUKDA&#39; │              &#39;Plasma serine protease inhibitor&#39;               │ [ &#39;H920_17264&#39; ] │
+│    1    │ &#39;A0A096NJK2_PAPAN&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│    2    │ &#39;A0A0D9REJ2_CHLSB&#39; │                  &#39;Serpin family A member 5&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│    3    │ &#39;A0A1D5QZ04_MACMU&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│    4    │ &#39;A0A1U7U5R8_TARSY&#39; │              &#39;plasma serine protease inhibitor&#39;               │  [ &#39;SERPINA5&#39; ]  │
+│    5    │ &#39;A0A1U8BVH3_MESAU&#39; │              &#39;plasma serine protease inhibitor&#39;               │  [ &#39;Serpina5&#39; ]  │
+│    6    │ &#39;A0A2I2YDG3_GORGO&#39; │                  &#39;Serpin family A member 5&#39;                   │    undefined     │
+│    7    │ &#39;A0A2J8QMG0_PANTR&#39; │                     &#39;SERPINA5 isoform 1&#39;                      │  [ &#39;SERPINA5&#39; ]  │
+│    8    │ &#39;A0A2K5BUG0_AOTNA&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│    9    │ &#39;A0A2K5JNV2_COLAP&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   10    │ &#39;A0A2K5MCI7_CERAT&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   11    │ &#39;A0A2K5Q5I2_CEBCA&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   12    │ &#39;A0A2K5WK85_MACFA&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   13    │ &#39;A0A2K5YI81_MANLE&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   14    │ &#39;A0A2K6CF53_MACNE&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   15    │ &#39;A0A2K6EKL0_PROCO&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   16    │ &#39;A0A2K6LR94_RHIBE&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   17    │ &#39;A0A2K6PIF0_RHIRO&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   18    │ &#39;A0A2K6V1R2_SAIBB&#39; │                  &#39;Serpin family A member 5&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   19    │ &#39;A0A2R9AU45_PANPA&#39; │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   20    │   &#39;D2HEM8_AILME&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   21    │   &#39;E2RMF9_CANLF&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   22    │    &#39;F1SCE3_PIG&#39;    │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   23    │    &#39;F7EMJ6_RAT&#39;    │ &#39;Serine (Or cysteine) peptidase inhibitor, clade A, member 5&#39; │  [ &#39;Serpina5&#39; ]  │
+│   24    │   &#39;F7GRA1_CALJA&#39;   │                  &#39;Serpin family A member 5&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   25    │   &#39;G1S667_NOMLE&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   26    │   &#39;G1SQG6_RABIT&#39;   │                  &#39;Serpin family A member 5&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   27    │   &#39;G3T0X8_LOXAF&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   28    │   &#39;G5B492_HETGA&#39;   │              &#39;Plasma serine protease inhibitor&#39;               │ [ &#39;GW7_16185&#39; ]  │
+│   29    │   &#39;H0VZ56_CAVPO&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   30    │   &#39;H0X6H4_OTOGA&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   31    │   &#39;H2NM57_PONAB&#39;   │                  &#39;Serpin family A member 5&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   32    │   &#39;I3NE99_ICTTR&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   33    │   &#39;L8ILP6_9CETA&#39;   │              &#39;Plasma serine protease inhibitor&#39;               │ [ &#39;M91_13739&#39; ]  │
+│   34    │   &#39;M3WCX5_FELCA&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   35    │   &#39;M3XVL4_MUSPF&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+│   36    │    &#39;IPSP_HUMAN&#39;    │              &#39;Plasma serine protease inhibitor&#39;               │  [ &#39;SERPINA5&#39; ]  │
+│   37    │    &#39;IPSP_MOUSE&#39;    │              &#39;Plasma serine protease inhibitor&#39;               │  [ &#39;Serpina5&#39; ]  │
+│   38    │    &#39;IPSP_BOVIN&#39;    │              &#39;Plasma serine protease inhibitor&#39;               │  [ &#39;SERPINA5&#39; ]  │
+│   39    │   &#39;W5Q0L2_SHEEP&#39;   │                   &#39;Uncharacterized protein&#39;                   │  [ &#39;SERPINA5&#39; ]  │
+└─────────┴────────────────────┴───────────────────────────────────────────────────────────────┴──────────────────┘</code></pre></div></div><div class="code"><div class="wrapper">program
+    .command(<span class="hljs-string">'go-proteins &lt;goterm&gt;'</span>)
+    .description(<span class="hljs-string">'Search the EBI proteins database for gene products associated with a given gene ontology'</span>)
+    .action(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">query, cmd</span>) </span>{
+        gemma.query.goProteins(query, cmd)
+            .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">results</span>) </span>{
+                <span class="hljs-keyword">if</span> (results.length) {
+                    <span class="hljs-built_in">console</span>.table(results);
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">const</span> msg = <span class="hljs-string">`no results found for GO term <span class="hljs-subst">${query}</span>\n`</span>;
                     process.stdout.write(chalk.red.bold(msg));
                 }
             }).catch(err =&gt; signale.error(err.message));
